@@ -1,43 +1,40 @@
+const fs = require('fs');
 const { google } = require('googleapis');
-const keys = require('./credentials.json');
 
-// ✅ إصلاح مشكلة private_key بسطر واحد
-const formattedKey = keys.private_key.replace(/\\n/g, '\n');
+// تحميل بيانات الخدمة من credentials.json
+const credentials = require('./credentials.json');
 
-async function readSheetData(sheetName, range = 'A1:L50') {
-  const client = new google.auth.JWT(
-    keys.client_email,
-    null,
-    formattedKey,
-    ['https://www.googleapis.com/auth/spreadsheets.readonly']
-  );
+// إعداد المصادقة
+const auth = new google.auth.GoogleAuth({
+  credentials,
+  scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+});
 
-  await client.authorize();
+// ID الجدول + النطاق الذي تريد قراءته
+const SPREADSHEET_ID = 'ضع_هنا_معرف_الجدول';
+const RANGE = 'ورقة1!A1:C10'; // غيّره حسب اسم الورقة والنطاق
 
+async function accessSheet() {
+  const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
 
-  const spreadsheetId = '1XmZKicNeBpdu2MKvDFlFgu4tWMgBT9YQWeP2hkxyfHA';
-
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: `${sheetName}!${range}`,
-  });
-
-  return response.data.values;
-}
-
-async function main() {
   try {
-    const commissions = await readSheetData('توزيع العمولات');
-    const users = await readSheetData('المستخدمين', 'A1:D50');
-    const pyramid = await readSheetData('الهرم', 'A1:E50');
+    const response = await sheets.spreadsheets.values.get({
+      spreadsheetId: SPREADSHEET_ID,
+      range: RANGE,
+    });
 
-    console.log('\n📋 توزيع العمولات:\n', commissions);
-    console.log('\n👤 المستخدمين:\n', users);
-    console.log('\n🏛️ الهرم:\n', pyramid);
-  } catch (error) {
-    console.error('❌ حدث خطأ:', error.message);
+    const rows = response.data.values;
+
+    if (rows.length) {
+      console.log('📄 المحتوى:');
+      rows.forEach((row) => console.log(row));
+    } else {
+      console.log('⚠️ لا توجد بيانات.');
+    }
+  } catch (err) {
+    console.error('❌ حدث خطأ:', err);
   }
 }
 
-main();
+accessSheet();
