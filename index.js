@@ -1,40 +1,47 @@
-const fs = require('fs');
 const { google } = require('googleapis');
-
-// تحميل بيانات الخدمة من credentials.json
 const credentials = require('./credentials.json');
 
-// إعداد المصادقة
+// إعداد Google Auth
 const auth = new google.auth.GoogleAuth({
   credentials,
   scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
 });
 
-// ID الجدول + النطاق الذي تريد قراءته
-const SPREADSHEET_ID = 'ضع_هنا_معرف_الجدول';
-const RANGE = 'ورقة1!A1:C10'; // غيّره حسب اسم الورقة والنطاق
+// معرف الجدول
+const SPREADSHEET_ID = '1XmZKicNeBpdu2MKvDFlFgu4tWMgBT9YQWeP2hkxyfHA';
 
-async function accessSheet() {
+// دالة قراءة البيانات من ورقة معينة
+async function readSheetData(sheetName, range = 'A1:L100') {
   const client = await auth.getClient();
   const sheets = google.sheets({ version: 'v4', auth: client });
 
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `${sheetName}!${range}`,
+  });
+
+  return response.data.values || [];
+}
+
+// البرنامج الرئيسي
+async function main() {
   try {
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
-      range: RANGE,
-    });
+    const commissions = await readSheetData('توزيع العمولات', 'A1:L100');
+    const users = await readSheetData('المستخدمين', 'A1:D100');
+    const pyramid = await readSheetData('الهرم', 'A1:E100');
 
-    const rows = response.data.values;
+    console.log('\n📋 توزيع العمولات:\n');
+    console.table(commissions);
 
-    if (rows.length) {
-      console.log('📄 المحتوى:');
-      rows.forEach((row) => console.log(row));
-    } else {
-      console.log('⚠️ لا توجد بيانات.');
-    }
-  } catch (err) {
-    console.error('❌ حدث خطأ:', err);
+    console.log('\n👤 المستخدمين:\n');
+    console.table(users);
+
+    console.log('\n🏛️ الهرم:\n');
+    console.table(pyramid);
+
+  } catch (error) {
+    console.error('❌ خطأ:', error.message);
   }
 }
 
-accessSheet();
+main();
