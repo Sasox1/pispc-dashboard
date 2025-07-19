@@ -1,14 +1,14 @@
 const { google } = require('googleapis');
 const keys = require('./credentials.json');
 
-// استبدال \\n بأسطر حقيقية في المفتاح
+// ✅ إصلاح مشكلة private_key بسطر واحد
 const formattedKey = keys.private_key.replace(/\\n/g, '\n');
 
 async function readSheetData(sheetName, range = 'A1:L50') {
   const client = new google.auth.JWT(
     keys.client_email,
     null,
-    formattedKey, // المفتاح بعد تنسيقه
+    formattedKey,
     ['https://www.googleapis.com/auth/spreadsheets.readonly']
   );
 
