@@ -5,7 +5,8 @@ export default function DashboardPage() {
   const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    const marketerId = localStorage.getItem('marketerId') || '12345'; // ✅ غيّر الرقم حسب تسجيل الدخول
+    const marketerId = 'c2'; // ✅ تم التثبيت مؤقتًا لتجربة المسوق hamam
+
     fetch('/api/dashboard', {
       method: 'POST',
       headers: {

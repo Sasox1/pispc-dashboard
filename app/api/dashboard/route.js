@@ -16,16 +16,11 @@ const auth = new JWT({
 const sheets = google.sheets({ version: 'v4', auth });
 
 async function getSheetData(sheetName) {
-  try {
-    const res = await sheets.spreadsheets.values.get({
-      spreadsheetId,
-      range: sheetName,
-    });
-    return res.data.values || [];
-  } catch (error) {
-    console.error(`❌ Error fetching sheet "${sheetName}":`, error.message);
-    return [];
-  }
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId,
+    range: sheetName,
+  });
+  return res.data.values;
 }
 
 export async function POST(req) {
@@ -34,7 +29,7 @@ export async function POST(req) {
     const { marketerId } = body;
 
     if (!marketerId) {
-      return NextResponse.json({ message: 'Missing marketerId' }, { status: 400 });
+      return NextResponse.json({ error: 'رقم المسوق غير مُرسل' }, { status: 400 });
     }
 
     const [
@@ -49,7 +44,6 @@ export async function POST(req) {
       getSheetData('سجل الترقية')
     ]);
 
-    // بيانات العمولات
     const directSales = commissions.filter(row => row[0] === marketerId && row[2] === '✓');
     const referralSales = commissions.filter(row => row[0] === marketerId && row[3] === '✓');
     const referralOfReferralSales = commissions.filter(row => row[0] === marketerId && row[4] === '✓');
@@ -61,13 +55,11 @@ export async function POST(req) {
     const totalPaid = commissions.filter(row => row[0] === marketerId && row[11] === '✓').length;
     const totalPending = commissions.filter(row => row[0] === marketerId && row[11] !== '✓').length;
 
-    // الترقية
     const upgradeRecords = upgrades.filter(row => row[1] === marketerId);
 
-    // الفريق
     const pyramidRow = pyramid.find(row => row[0] === marketerId);
-    const teamA = pyramidRow?.[2]?.split(',').filter(Boolean) || [];
-    const teamB = pyramidRow?.[3]?.split(',').filter(Boolean) || [];
+    const teamA = pyramidRow ? pyramidRow[2]?.split(',').filter(Boolean) : [];
+    const teamB = pyramidRow ? pyramidRow[3]?.split(',').filter(Boolean) : [];
 
     return NextResponse.json({
       stats: {
@@ -82,10 +74,7 @@ export async function POST(req) {
       }
     });
   } catch (error) {
-    console.error('❌ Dashboard route error:', error);
-    return NextResponse.json(
-      { message: 'خطأ في السيرفر', error: error.message },
-      { status: 500 }
-    );
+    console.error('Dashboard route error:', error);
+    return NextResponse.json({ message: 'خطأ في السيرفر', error: error.message }, { status: 500 });
   }
 }
