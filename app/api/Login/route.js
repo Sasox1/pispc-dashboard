@@ -6,7 +6,7 @@ export async function POST(request) {
     const body = await request.json();
     const { email, password } = body;
 
-    // استدعاء بيانات المستخدمين من ورقة Google Sheets
+    // استدعاء بيانات المستخدمين من Google Sheets
     const users = await getSheetData('1XmZKicNeBpdu2MKvDFlFgu4tWMgBT9YQWeP2hkxyfHA', 'المستخدمين!A2:D');
 
     // التحقق من وجود المستخدم بالبريد وكلمة المرور
@@ -17,7 +17,8 @@ export async function POST(request) {
     }
 
     // تسجيل الدخول ناجح
-    return NextResponse.json({ message: 'نجح تسجيل الدخول', marketerId: row[2] });
+    return NextResponse.json({ message: 'نجح تسجيل الدخول', marketerId: user[2] });
+
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json({ message: 'خطأ في الخادم' }, { status: 500 });
