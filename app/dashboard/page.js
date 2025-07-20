@@ -1,49 +1,78 @@
-// app/dashboard/page.js
 'use client';
 import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
-  const [data, setData] = useState(null);
+  const [stats, setStats] = useState(null);
 
   useEffect(() => {
-    fetch('/api/dashboard')
-      .then((res) => res.json())
-      .then(setData)
-      .catch(console.error);
+    const marketerId = localStorage.getItem('marketerId') || '12345'; // ✅ غيّر الرقم حسب تسجيل الدخول
+    fetch('/api/dashboard', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ marketerId })
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('فشل في تحميل البيانات');
+        return res.json();
+      })
+      .then((data) => setStats(data.stats))
+      .catch((err) => console.error('Dashboard error:', err));
   }, []);
 
-  if (!data) return <div className="p-4 text-gray-500">جاري التحميل...</div>;
+  if (!stats) {
+    return <div className="p-8 text-gray-500 animate-pulse">جاري تحميل لوحة التحكم...</div>;
+  }
 
   return (
-    <div className="p-8 space-y-6">
-      <h1 className="text-3xl font-bold">لوحة التحكم</h1>
+    <div className="p-8 space-y-6 bg-gradient-to-br from-gray-50 to-white min-h-screen">
+      <h1 className="text-4xl font-extrabold text-gray-800 border-b pb-4">📊 لوحة تحكم المسوق</h1>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-        <div className="bg-white rounded-2xl shadow p-4">
-          <div className="text-gray-500">إجمالي المبيعات</div>
-          <div className="text-xl font-bold">{data.totalSales}</div>
-        </div>
-        <div className="bg-white rounded-2xl shadow p-4">
-          <div className="text-gray-500">العمولة المباشرة</div>
-          <div className="text-xl font-bold">{data.directCommission} SP</div>
-        </div>
-        <div className="bg-white rounded-2xl shadow p-4">
-          <div className="text-gray-500">العمولة من فريق A</div>
-          <div className="text-xl font-bold">{data.teamACommission} SP</div>
-        </div>
-        <div className="bg-white rounded-2xl shadow p-4">
-          <div className="text-gray-500">العمولة من فريق B</div>
-          <div className="text-xl font-bold">{data.teamBCommission} SP</div>
-        </div>
-        <div className="bg-white rounded-2xl shadow p-4">
-          <div className="text-gray-500">عمولات مدفوعة</div>
-          <div className="text-xl font-bold">{data.paidCount}</div>
-        </div>
-        <div className="bg-white rounded-2xl shadow p-4">
-          <div className="text-gray-500">عمولات قيد الانتظار</div>
-          <div className="text-xl font-bold">{data.pendingCount}</div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard title="العمولة المباشرة" value={stats.totalDirectCommission + ' SP'} icon="💼" />
+        <StatCard title="عمولة الإحالة" value={stats.totalReferralCommission + ' SP'} icon="👥" />
+        <StatCard title="عمولة إحالة الإحالة" value={stats.totalRofRCommission + ' SP'} icon="📡" />
+        <StatCard title="العمولات المدفوعة" value={stats.totalPaid} icon="✅" />
+        <StatCard title="العمولات غير المدفوعة" value={stats.totalPending} icon="⏳" />
+        <StatCard title="عدد ترقياتك" value={stats.upgradeHistory.length} icon="🚀" />
+      </div>
+
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold mb-4">🧑‍🤝‍🧑 فريقك:</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <TeamCard label="فريق A (الإحالة المباشرة)" members={stats.teamA} />
+          <TeamCard label="فريق B (إحالة الإحالة)" members={stats.teamB} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function StatCard({ title, value, icon }) {
+  return (
+    <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+      <div className="text-sm text-gray-500 mb-1 flex items-center gap-2">
+        <span className="text-lg">{icon}</span> {title}
+      </div>
+      <div className="text-2xl font-bold text-gray-800">{value}</div>
+    </div>
+  );
+}
+
+function TeamCard({ label, members }) {
+  return (
+    <div className="bg-white rounded-2xl shadow p-6">
+      <div className="text-gray-600 font-semibold mb-2">{label}</div>
+      {members.length > 0 ? (
+        <ul className="list-disc list-inside text-gray-700 space-y-1">
+          {members.map((m, i) => (
+            <li key={i}>{m}</li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-gray-400 italic">لا يوجد أعضاء</p>
+      )}
     </div>
   );
 }
