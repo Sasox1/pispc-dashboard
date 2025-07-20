@@ -1,8 +1,13 @@
 import { google } from 'googleapis';
 import { readFileSync } from 'fs';
+import path from 'path';
 
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-const CREDENTIALS = JSON.parse(readFileSync('credentials.json'));
+
+// حمّل بيانات الاعتماد من ملف credentials.json في جذر المشروع
+const CREDENTIALS = JSON.parse(
+  readFileSync(path.join(process.cwd(), 'credentials.json'))
+);
 
 const auth = new google.auth.GoogleAuth({
   credentials: CREDENTIALS,
@@ -11,26 +16,11 @@ const auth = new google.auth.GoogleAuth({
 
 const sheets = google.sheets({ version: 'v4', auth });
 
-const SHEET_ID = '1XmZKicNeBpdu2MKvDFlFgu4tWMgBT9YQWeP2hkxyfHA';
-
-export async function verifyLogin(email, password) {
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: 'المستخدمين!A2:D',
+// ✅ دالة لجلب البيانات من Google Sheets
+export async function getSheetData(sheetId, range) {
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range,
   });
-
-  const rows = res.data.values || [];
-
-  const user = rows.find(
-    row => row[0] === email && row[1] === password
-  );
-
-  if (!user) return null;
-
-  return {
-    email: user[0],
-    password: user[1],
-    marketerId: user[2],
-    marketerEmail: user[3],
-  };
+  return response.data.values;
 }
