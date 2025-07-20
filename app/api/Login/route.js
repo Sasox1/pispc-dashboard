@@ -1,26 +1,40 @@
+// app/api/login/route.js
+
 import { NextResponse } from 'next/server';
 import { getSheetData } from '@/utils/sheets';
 
 export async function POST(request) {
   try {
-    const body = await request.json();
-    const { email, password } = body;
+    const { email, password } = await request.json();
 
-    // استدعاء بيانات المستخدمين من Google Sheets
-    const users = await getSheetData('1XmZKicNeBpdu2MKvDFlFgu4tWMgBT9YQWeP2hkxyfHA', 'المستخدمين!A2:D');
+    // اقرأ البيانات من ورقة "المستخدمين"
+    const users = await getSheetData('المستخدمين', 'A:D'); // A:D هو نطاق الأعمدة في الورقة
 
-    // التحقق من وجود المستخدم بالبريد وكلمة المرور
-    const user = users.find(row => row[3] === email && row[1] === password);
+    // تجاوز الصف الأول (عناوين الأعمدة)
+    for (let i = 1; i < users.length; i++) {
+      const row = users[i];
+      const userEmail = row[3]?.trim();
+      const userPassword = row[1]?.trim();
 
-    if (!user) {
-      return NextResponse.json({ message: 'بيانات الدخول غير صحيحة' }, { status: 401 });
+      if (userEmail === email && userPassword === password) {
+        // تسجيل دخول ناجح
+        return NextResponse.json({
+          message: 'نجح تسجيل الدخول',
+          marketerId: row[0],
+        });
+      }
     }
 
-    // تسجيل الدخول ناجح
-    return NextResponse.json({ message: 'نجح تسجيل الدخول', marketerId: user[2] });
-
+    // بيانات غير صحيحة
+    return NextResponse.json(
+      { message: 'بيانات الدخول غير صحيحة' },
+      { status: 401 }
+    );
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json({ message: 'خطأ في الخادم' }, { status: 500 });
+    return NextResponse.json(
+      { message: 'حدث خطأ أثناء تسجيل الدخول' },
+      { status: 500 }
+    );
   }
 }
