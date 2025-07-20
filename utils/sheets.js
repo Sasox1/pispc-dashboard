@@ -1,20 +1,19 @@
+// ✅ 1. utils/sheets.js
 import { google } from 'googleapis';
-import { readFileSync } from 'fs';
+import credentials from '@/credentials.json';
 
-const SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly'];
-const CREDENTIALS = JSON.parse(readFileSync('credentials.json'));
-
-const auth = new google.auth.GoogleAuth({
-  credentials: CREDENTIALS,
-  scopes: SCOPES,
-});
-
-const sheets = google.sheets({ version: 'v4', auth });
-
-export async function getSheetData(sheetId, range) {
-  const response = await sheets.spreadsheets.values.get({
-    spreadsheetId: sheetId,
-    range,
+export async function getSheetData(sheetName) {
+  const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly']
   });
-  return response.data.values;
+
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: '1XmZKicNeBpdu2MKvDFlFgu4tWMgBT9YQWeP2hkxyfHA',
+    range: `${sheetName}`,
+  });
+
+  return res.data.values;
 }
