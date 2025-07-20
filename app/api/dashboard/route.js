@@ -20,6 +20,7 @@ async function getSheetData(sheetName) {
     spreadsheetId,
     range: sheetName,
   });
+  console.log(`📄 Loaded sheet: ${sheetName}`, res.data.values?.length || 0);
   return res.data.values;
 }
 
@@ -28,7 +29,8 @@ export async function POST(req) {
     const body = await req.json();
     const { marketerId } = body;
 
-    // جلب البيانات من الأوراق
+    console.log('📩 Received marketerId:', marketerId);
+
     const [commissions, users, pyramid, upgrades] = await Promise.all([
       getSheetData('توزيع العمولات'),
       getSheetData('المستخدمين'),
@@ -36,27 +38,23 @@ export async function POST(req) {
       getSheetData('سجل الترقية'),
     ]);
 
-    // تجاهل رأس الجدول إن وجد
     const data = commissions.filter(row => row[0] && row[0] !== 'ID');
 
-    // استخراج المبيعات حسب نوع العمولة
+    console.log(`📊 Found ${data.length} commission entries`);
+
     const directSales = data.filter(row => row[0] === marketerId && row[2] === '✓');
     const referralSales = data.filter(row => row[0] === marketerId && row[3] === '✓');
     const referralOfReferralSales = data.filter(row => row[0] === marketerId && row[4] === '✓');
 
-    // المدفوعات
     const totalPaid = data.filter(row => row[0] === marketerId && row[11] === '✓').length;
     const totalPending = data.filter(row => row[0] === marketerId && row[11] !== '✓').length;
 
-    // ترقيات
     const upgradeRecords = upgrades.filter(row => row[1] === marketerId);
 
-    // الفريق
     const pyramidRow = pyramid.find(row => row[0] === marketerId);
     const teamA = pyramidRow?.[2]?.split(',').filter(Boolean) || [];
     const teamB = pyramidRow?.[3]?.split(',').filter(Boolean) || [];
 
-    // الاستجابة النهائية
     const response = {
       stats: {
         totalDirectCommission: directSales.length,
@@ -70,7 +68,7 @@ export async function POST(req) {
       }
     };
 
-    console.log('✅ Dashboard response:', response); // للتصحيح
+    console.log('✅ Final dashboard response:', JSON.stringify(response, null, 2));
 
     return NextResponse.json(response);
   } catch (error) {
