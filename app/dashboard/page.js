@@ -3,15 +3,17 @@ import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
+  const [debug, setDebug] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
     const marketerId = sessionStorage.getItem('marketerId');
-
     if (!marketerId) {
-      setError('لم يتم العثور على بيانات الدخول، الرجاء تسجيل الدخول مجددًا.');
+      setError('⚠️ لم يتم العثور على بيانات الدخول (marketerId). الرجاء تسجيل الدخول مجددًا.');
       return;
     }
+
+    setDebug(`🔍 تم العثور على المعرف: marketerId = ${marketerId}`);
 
     fetch('/api/dashboard', {
       method: 'POST',
@@ -21,22 +23,26 @@ export default function DashboardPage() {
       body: JSON.stringify({ marketerId })
     })
       .then((res) => {
-        if (!res.ok) throw new Error('فشل في تحميل البيانات');
+        if (!res.ok) throw new Error('❌ فشل في تحميل البيانات من API');
         return res.json();
       })
-      .then((data) => setStats(data.stats))
+      .then((data) => {
+        console.log('✅ البيانات المستلمة من السيرفر:', data);
+        setDebug(prev => prev + `\n✅ تم استلام البيانات من السيرفر بنجاح.`);
+        setStats(data.stats);
+      })
       .catch((err) => {
-        console.error('Dashboard error:', err);
-        setError('فشل في تحميل البيانات من السيرفر');
+        console.error('❌ خطأ أثناء التحميل:', err);
+        setError('❌ فشل في تحميل البيانات من السيرفر');
       });
   }, []);
 
   if (error) {
-    return <div className="p-8 text-red-500">{error}</div>;
+    return <div className="p-8 text-red-600 font-bold whitespace-pre-wrap">{error}\n{debug}</div>;
   }
 
   if (!stats) {
-    return <div className="p-8 text-gray-500 animate-pulse">جاري تحميل لوحة التحكم...</div>;
+    return <div className="p-8 text-gray-500 animate-pulse whitespace-pre-wrap">⏳ جاري تحميل البيانات...\n{debug}</div>;
   }
 
   return (
@@ -58,6 +64,12 @@ export default function DashboardPage() {
           <TeamCard label="فريق A (الإحالة المباشرة)" members={stats.teamA} />
           <TeamCard label="فريق B (إحالة الإحالة)" members={stats.teamB} />
         </div>
+      </div>
+
+      {/* ✅ DEBUG SECTION */}
+      <div className="mt-10 bg-gray-100 p-4 rounded-xl text-xs text-gray-600 whitespace-pre-wrap">
+        🛠️ <strong>معلومات تصحيحية (Debug Info):</strong>
+        {debug}
       </div>
     </div>
   );
