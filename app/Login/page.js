@@ -6,24 +6,35 @@ import { useRouter } from 'next/navigation';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const router = useRouter();
   const [error, setError] = useState('');
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (res.ok) {
+      if (!res.ok) {
+        setError('بيانات الدخول غير صحيحة');
+        return;
+      }
+
       const data = await res.json();
       const marketerId = data.marketerId;
-      router.push(`/dashboard?marketerId=${encodeURIComponent(marketerId)}`);
-    } else {
-      setError('بيانات الدخول غير صحيحة');
+
+      // 🔐 تخزين المعرف في sessionStorage
+      sessionStorage.setItem('marketerId', marketerId);
+
+      // 🚀 الانتقال إلى لوحة التحكم
+      router.push('/dashboard');
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('حدث خطأ أثناء تسجيل الدخول');
     }
   };
 
