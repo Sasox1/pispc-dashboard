@@ -1,104 +1,203 @@
-/*
-  هذا هو الكود الأساسي لواجهة Dashboard احترافية عصرية لمسوق
-  يستخدم مكتبة recharts لعرض الرسوم البيانية، و shadcn/ui لبطاقات عرض المحتوى.
-*/
-
+// 📁 app/dashboard/page.js
 "use client";
 
 import { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { getSheetData } from "@/utils/sheets";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  BarChart,
+  XAxis,
+  YAxis,
+  Bar,
+  CartesianGrid,
+  Legend,
+} from "recharts";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28EFF", "#FF6A9F"];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#AF19FF"];
 
-export default function DashboardPage() {
+export default function Dashboard() {
   const [commissions, setCommissions] = useState([]);
-  const [stats, setStats] = useState({});
-  const searchParams = useSearchParams();
-  const marketerId = searchParams.get("id"); // معرف المسوّق من رابط URL
+  const [marketerId, setMarketerId] = useState(null);
+
+  const [stats, setStats] = useState({
+    directSales: 0,
+    referrals: 0,
+    subReferrals: 0,
+    totalSales: 0,
+    packageCounts: {},
+    directCommission: 0,
+    referralCommission: 0,
+    subReferralCommission: 0,
+    paid: 0,
+    pending: 0,
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      const sheetId = "1XmZKicNeBpdu2MKvDFlFgu4tWMgBT9YQWeP2hkxyfHA";
-      const range = "توزيع العمولات!A2:L";
-      const rows = await getSheetData(sheetId, range);
-      const filtered = rows.filter(row => row[0] === marketerId);
+    const localData = localStorage.getItem("marketerId");
+    if (!localData) return;
+    setMarketerId(localData);
+  }, []);
 
-      const stats = {
-        totalSales: filtered.length,
-        directSales: filtered.filter(row => row[2] === "✓").length,
-        teamA: filtered.filter(row => row[3] === "✓").length,
-        teamB: filtered.filter(row => row[4] === "✓").length,
-        paid: filtered.filter(row => row[11] === "✓").length,
-        pending: filtered.filter(row => row[11] !== "✓").length,
-        packages: {},
-      };
+  useEffect(() => {
+    if (!marketerId) return;
+    const fetchData = async () => {
+      const rawData = await getSheetData("توزيع العمولات");
+      const filtered = rawData.filter((row) => row[0] === marketerId);
 
-      filtered.forEach(row => {
-        const pkg = row[5] || "غير معروف";
-        stats.packages[pkg] = (stats.packages[pkg] || 0) + 1;
+      let direct = 0,
+        referral = 0,
+        subReferral = 0,
+        packages = {},
+        paid = 0,
+        pending = 0,
+        directAmount = 0,
+        referralAmount = 0,
+        subReferralAmount = 0;
+
+      for (let row of filtered) {
+        const saleType = row[2];
+        const packageName = row[1];
+        const status = row[11];
+
+        packages[packageName] = (packages[packageName] || 0) + 1;
+
+        if (saleType === "بيع مباشر") {
+          direct++;
+          directAmount += parseInt(row[4] || "0");
+        } else if (saleType === "احالة") {
+          referral++;
+          referralAmount += parseInt(row[6] || "0");
+        } else if (saleType === "احالة احالة") {
+          subReferral++;
+          subReferralAmount += parseInt(row[8] || "0");
+        }
+
+        if (status === "✓") paid++;
+        else pending++;
+      }
+
+      setStats({
+        directSales: direct,
+        referrals: referral,
+        subReferrals: subReferral,
+        totalSales: direct + referral + subReferral,
+        packageCounts: packages,
+        directCommission: directAmount,
+        referralCommission: referralAmount,
+        subReferralCommission: subReferralAmount,
+        paid,
+        pending,
       });
-
-      setCommissions(filtered);
-      setStats(stats);
-    }
-    if (marketerId) fetchData();
+    };
+    fetchData();
   }, [marketerId]);
 
-  const pieData = Object.entries(stats.packages || {}).map(([name, value]) => ({
+  const pieData = Object.entries(stats.packageCounts).map(([name, value]) => ({
     name,
     value,
   }));
 
-  const SquareBox = ({ title, value, href }) => (
-    <Link href={href}>
-      <Card className="rounded-2xl shadow-md hover:shadow-xl transition cursor-pointer">
-        <CardContent className="p-4">
-          <h3 className="text-lg font-semibold text-gray-700">{title}</h3>
-          <p className="text-2xl font-bold text-blue-600">{value}</p>
-        </CardContent>
-      </Card>
-    </Link>
-  );
+  const barData = [
+    {
+      name: "العمولات",
+      مباشر: stats.directCommission,
+      إحالة: stats.referralCommission,
+      إحالة_إحالة: stats.subReferralCommission,
+    },
+  ];
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-3xl font-bold">لوحة تحكم المسوق</h1>
+    <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">عدد المبيعات الكلي</h2>
+          <p className="text-3xl">{stats.totalSales}</p>
+        </CardContent>
+      </Card>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <SquareBox title="عدد المبيعات الكلي" value={stats.totalSales || 0} href="/dashboard/sales" />
-        <SquareBox title="مبيعات مباشرة" value={stats.directSales || 0} href="/dashboard/direct-sales" />
-        <SquareBox title="عمولة فريق A" value={stats.teamA || 0} href="/dashboard/team-a" />
-        <SquareBox title="عمولة فريق B" value={stats.teamB || 0} href="/dashboard/team-b" />
-        <SquareBox title="عمولات مدفوعة" value={stats.paid || 0} href="/dashboard/paid" />
-        <SquareBox title="قيد الانتظار" value={stats.pending || 0} href="/dashboard/pending" />
-      </div>
-
-      <div className="bg-white rounded-2xl p-6 shadow-md">
-        <h2 className="text-xl font-semibold mb-4">نسبة الباقات المباعة</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">رسم دائري لنسب الحزم</h2>
+          <PieChart width={300} height={250}>
             <Pie
               data={pieData}
-              dataKey="value"
-              nameKey="name"
               cx="50%"
               cy="50%"
-              outerRadius={100}
-              fill="#8884d8"
-              label
+              labelLine={false}
+              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              outerRadius={80}
+              dataKey="value"
             >
-              {pieData.map((_, index) => (
+              {pieData.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip />
           </PieChart>
-        </ResponsiveContainer>
-      </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">رسم عمودي للعمولات</h2>
+          <BarChart width={300} height={250} data={barData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="مباشر" fill="#8884d8" />
+            <Bar dataKey="إحالة" fill="#82ca9d" />
+            <Bar dataKey="إحالة_إحالة" fill="#ffc658" />
+          </BarChart>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">عمولة مباشرة</h2>
+          <p className="text-2xl text-green-600 font-bold">{stats.directCommission} SP</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">عمولة فريق A</h2>
+          <p className="text-2xl text-blue-600 font-bold">{stats.referralCommission} SP</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">عمولة فريق B</h2>
+          <p className="text-2xl text-purple-600 font-bold">{stats.subReferralCommission} SP</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">العمولات المدفوعة</h2>
+          <p className="text-2xl text-green-700">{stats.paid}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <h2 className="text-xl font-semibold mb-2">قيد الانتظار</h2>
+          <p className="text-2xl text-yellow-500">{stats.pending}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4 flex justify-center items-center">
+          <Button className="text-white bg-black hover:bg-gray-800">عرض التفاصيل</Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }
