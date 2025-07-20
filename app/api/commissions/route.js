@@ -1,10 +1,15 @@
-// app/api/commissions/route.js
+import { NextResponse } from 'next/server';
+import { getSheetData } from '@/utils/sheets';
 
-export async function GET(request) {
-  return new Response(JSON.stringify({ message: '✅ API is working' }), {
-    status: 200,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
+const SHEET_ID = process.env.SHEET_ID;
+const COMMISSIONS_RANGE = 'توزيع العمولات!A1:L';
+
+export async function GET() {
+  try {
+    const data = await getSheetData(SHEET_ID, COMMISSIONS_RANGE);
+    return NextResponse.json({ data });
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json({ error: 'Failed to fetch data' }, { status: 500 });
+  }
 }

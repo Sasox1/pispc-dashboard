@@ -19,7 +19,7 @@ export default function LoginPage() {
     });
 
     if (res.ok) {
-      router.push('/Dashboard');
+      router.push('/dashboard');
     } else {
       setError('بيانات الدخول غير صحيحة');
     }
