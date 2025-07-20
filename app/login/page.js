@@ -5,25 +5,25 @@ import { useState } from 'react';
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [result, setResult] = useState(null);
 
-  const handleLogin = async (e) => {
+  async function handleLogin(e) {
     e.preventDefault();
-
-    const response = await fetch('/api/login', {
+    const res = await fetch('/login', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
 
-    const data = await response.json();
-    setResult(data);
-  };
+    if (res.ok) {
+      alert('تم تسجيل الدخول بنجاح');
+      // هنا يمكنك التوجيه لواجهة Dashboard
+    } else {
+      alert('بيانات الدخول خاطئة');
+    }
+  }
 
   return (
-    <div style={{ padding: '2rem' }}>
+    <div style={{ padding: '2rem', maxWidth: 400, margin: '0 auto' }}>
       <h1>تسجيل الدخول</h1>
       <form onSubmit={handleLogin}>
         <input
@@ -32,24 +32,18 @@ export default function LoginPage() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          style={{ display: 'block', marginBottom: '1rem', width: '100%' }}
         />
-        <br /><br />
         <input
           type="password"
           placeholder="كلمة المرور"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          style={{ display: 'block', marginBottom: '1rem', width: '100%' }}
         />
-        <br /><br />
-        <button type="submit">تسجيل الدخول</button>
+        <button type="submit">دخول</button>
       </form>
-
-      {result && (
-        <div style={{ marginTop: '1rem' }}>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 }
