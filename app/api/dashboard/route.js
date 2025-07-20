@@ -16,11 +16,16 @@ const auth = new JWT({
 const sheets = google.sheets({ version: 'v4', auth });
 
 async function getSheetData(sheetName) {
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId,
-    range: sheetName,
-  });
-  return res.data.values;
+  try {
+    const res = await sheets.spreadsheets.values.get({
+      spreadsheetId,
+      range: sheetName,
+    });
+    return res.data.values || [];
+  } catch (error) {
+    console.error(`❌ Error fetching sheet "${sheetName}":`, error.message);
+    return [];
+  }
 }
 
 export async function POST(req) {
@@ -28,7 +33,10 @@ export async function POST(req) {
     const body = await req.json();
     const { marketerId } = body;
 
-    // Load data from all relevant sheets
+    if (!marketerId) {
+      return NextResponse.json({ message: 'Missing marketerId' }, { status: 400 });
+    }
+
     const [
       commissions,
       users,
@@ -41,27 +49,25 @@ export async function POST(req) {
       getSheetData('سجل الترقية')
     ]);
 
-    // استخراج مبيعات المسوق
+    // بيانات العمولات
     const directSales = commissions.filter(row => row[0] === marketerId && row[2] === '✓');
     const referralSales = commissions.filter(row => row[0] === marketerId && row[3] === '✓');
     const referralOfReferralSales = commissions.filter(row => row[0] === marketerId && row[4] === '✓');
 
-    // حساب إجمالي العمولات المستحقة والمدفوعة (✓ = مدفوعة)
     const totalDirectCommission = directSales.length;
     const totalReferralCommission = referralSales.length;
     const totalRofRCommission = referralOfReferralSales.length;
 
-    // النسبة العامة للعمولات المدفوعة مقابل الإجمالية
     const totalPaid = commissions.filter(row => row[0] === marketerId && row[11] === '✓').length;
     const totalPending = commissions.filter(row => row[0] === marketerId && row[11] !== '✓').length;
 
-    // معلومات الترقية
+    // الترقية
     const upgradeRecords = upgrades.filter(row => row[1] === marketerId);
 
-    // الفريق من الهرم
+    // الفريق
     const pyramidRow = pyramid.find(row => row[0] === marketerId);
-    const teamA = pyramidRow ? pyramidRow[2]?.split(',').filter(Boolean) : [];
-    const teamB = pyramidRow ? pyramidRow[3]?.split(',').filter(Boolean) : [];
+    const teamA = pyramidRow?.[2]?.split(',').filter(Boolean) || [];
+    const teamB = pyramidRow?.[3]?.split(',').filter(Boolean) || [];
 
     return NextResponse.json({
       stats: {
@@ -76,7 +82,10 @@ export async function POST(req) {
       }
     });
   } catch (error) {
-    console.error('Dashboard route error:', error);
-    return NextResponse.json({ message: 'خطأ في السيرفر', error: error.message }, { status: 500 });
+    console.error('❌ Dashboard route error:', error);
+    return NextResponse.json(
+      { message: 'خطأ في السيرفر', error: error.message },
+      { status: 500 }
+    );
   }
 }
