@@ -1,40 +1,43 @@
-// ✅ /app/login/page.js - واجهة تسجيل الدخول التي تنقل إلى /dashboard بعد النجاح
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState } from 'react';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
-  const router = useRouter()
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [status, setStatus] = useState('');
+  const [userInfo, setUserInfo] = useState(null);
 
   const handleLogin = async (e) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setStatus('جارٍ التحقق...');
 
-    const res = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
 
-    const result = await res.json()
+      const data = await res.json();
 
-    if (res.ok) {
-      // ✅ تخزين بيانات المسوق في localStorage أو state (حسب حاجتك)
-      localStorage.setItem('marketerId', result.marketerId)
-      localStorage.setItem('marketerName', result.name)
-      router.push('/dashboard')
-    } else {
-      setError(result.message || 'حدث خطأ غير متوقع')
+      if (data.success) {
+        setStatus('✅ تم تسجيل الدخول بنجاح!');
+        setUserInfo(data);
+      } else {
+        setStatus('❌ ' + data.message);
+        setUserInfo(null);
+      }
+    } catch (err) {
+      console.error(err);
+      setStatus('❌ حدث خطأ في الاتصال بالسيرفر');
     }
-  }
+  };
 
   return (
-    <div style={{ padding: '2rem', maxWidth: 400, margin: '0 auto' }}>
-      <h1>تسجيل دخول المسوق</h1>
+    <div style={{ padding: '2rem', maxWidth: '400px', margin: 'auto' }}>
+      <h2>تسجيل دخول المسوّق</h2>
+
       <form onSubmit={handleLogin}>
         <div>
           <label>البريد الإلكتروني:</label>
@@ -43,20 +46,47 @@ export default function LoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            style={{ width: '100%', padding: '0.5rem' }}
           />
         </div>
-        <div>
+
+        <div style={{ marginTop: '1rem' }}>
           <label>كلمة المرور:</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            style={{ width: '100%', padding: '0.5rem' }}
           />
         </div>
-        <button type="submit">تسجيل الدخول</button>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+
+        <button
+          type="submit"
+          style={{
+            marginTop: '1.5rem',
+            padding: '0.75rem',
+            width: '100%',
+            backgroundColor: '#0070f3',
+            color: 'white',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          تسجيل الدخول
+        </button>
       </form>
+
+      <p style={{ marginTop: '1rem', color: 'green' }}>{status}</p>
+
+      {userInfo && (
+        <div style={{ marginTop: '2rem', background: '#f4f4f4', padding: '1rem' }}>
+          <h4>معلومات المستخدم:</h4>
+          <p><strong>الاسم:</strong> {userInfo.name}</p>
+          <p><strong>رقم المعرف:</strong> {userInfo.marketerId}</p>
+          <p><strong>البريد الإلكتروني:</strong> {userInfo.email}</p>
+        </div>
+      )}
     </div>
-  )
+  );
 }
