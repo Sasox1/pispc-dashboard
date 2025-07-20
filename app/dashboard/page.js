@@ -3,9 +3,15 @@ import { useEffect, useState } from 'react';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const marketerId = 'c2'; // ✅ تم التثبيت مؤقتًا لتجربة المسوق hamam
+    const marketerId = sessionStorage.getItem('marketerId');
+
+    if (!marketerId) {
+      setError('لم يتم العثور على بيانات الدخول، الرجاء تسجيل الدخول مجددًا.');
+      return;
+    }
 
     fetch('/api/dashboard', {
       method: 'POST',
@@ -19,8 +25,15 @@ export default function DashboardPage() {
         return res.json();
       })
       .then((data) => setStats(data.stats))
-      .catch((err) => console.error('Dashboard error:', err));
+      .catch((err) => {
+        console.error('Dashboard error:', err);
+        setError('فشل في تحميل البيانات من السيرفر');
+      });
   }, []);
+
+  if (error) {
+    return <div className="p-8 text-red-500">{error}</div>;
+  }
 
   if (!stats) {
     return <div className="p-8 text-gray-500 animate-pulse">جاري تحميل لوحة التحكم...</div>;
