@@ -19,7 +19,9 @@ export default function LoginPage() {
     });
 
     if (res.ok) {
-      router.push('/dashboard');
+      const data = await res.json();
+      const marketerId = data.marketerId;
+      router.push(`/dashboard?marketerId=${encodeURIComponent(marketerId)}`);
     } else {
       setError('بيانات الدخول غير صحيحة');
     }
