@@ -1,84 +1,177 @@
-import React from 'react';
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+// app/dashboard/page.js
+"use client";
 
-async function getData() {
-  const res = await fetch('http://localhost:3000/api/dashboard', {
-    cache: 'no-store',
+import React, { useEffect, useState } from "react";
+import { PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Legend } from "recharts";
+import { getSheetData } from "@/utils/sheets";
+import { Card, CardContent } from "@/components/ui/card";
+
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A28EFF", "#FF6699"];
+
+export default function DashboardPage() {
+  const [commissionData, setCommissionData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalSales: 0,
+    directSales: 0,
+    totalCommission: 0,
+    teamACommission: 0,
+    teamBCommission: 0,
+    paidCommissions: 0,
+    pendingCommissions: 0,
+    pieData: [],
   });
 
-  if (!res.ok) {
-    throw new Error('فشل في جلب البيانات');
-  }
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getSheetData("توزيع العمولات");
+        const headers = data[0];
+        const rows = data.slice(1);
 
-  const json = await res.json();
-  return json.data;
-}
+        const salesCount = {
+          "2 Mbps": 0,
+          "4 Mbps": 0,
+          "8 Mbps": 0,
+          "12 Mbps": 0,
+          "16 Mbps": 0,
+          "24 Mbps": 0,
+          "60 Mbps": 0,
+        };
 
-export default async function DashboardPage() {
-  const data = await getData();
+        let directSales = 0,
+          totalSales = 0,
+          totalCommission = 0,
+          teamA = 0,
+          teamB = 0,
+          paid = 0,
+          pending = 0;
 
-  // تجهيز بيانات الرسم البياني
-  const salesCounts = {};
-  data.slice(1).forEach(row => {
-    const packageName = row[1];
-    if (!salesCounts[packageName]) salesCounts[packageName] = 0;
-    salesCounts[packageName]++;
-  });
+        rows.forEach(row => {
+          const type = row[2]; // بيع مباشر، إحالة، إحالة إحالة
+          const amount = parseInt(row[5]) || 0;
+          const status = row[11];
+          const packageName = row[1];
 
-  const chartData = Object.entries(salesCounts).map(([name, value]) => ({ name, value }));
+          totalSales++;
 
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF4560'];
+          if (type === "بيع مباشر") {
+            directSales++;
+            totalCommission += amount;
+          } else if (type === "إحالة") {
+            teamA += amount;
+          } else if (type === "إحالة إحالة") {
+            teamB += amount;
+          }
 
-  const totalSales = data.length - 1;
-  const directSales = data.filter(row => row[2] === '✓').length;
-  const referralSales = data.filter(row => row[3] === '✓').length;
-  const subReferralSales = data.filter(row => row[4] === '✓').length;
+          if (status === "✓") {
+            paid += amount;
+          } else {
+            pending += amount;
+          }
+
+          if (salesCount[packageName] !== undefined) {
+            salesCount[packageName]++;
+          }
+        });
+
+        const pieData = Object.entries(salesCount).map(([name, value]) => ({
+          name,
+          value,
+        }));
+
+        setStats({
+          totalSales,
+          directSales,
+          totalCommission,
+          teamACommission: teamA,
+          teamBCommission: teamB,
+          paidCommissions: paid,
+          pendingCommissions: pending,
+          pieData,
+        });
+      } catch (err) {
+        console.error("خطأ في تحميل البيانات:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
   return (
-    <div className="p-6 space-y-8">
-      <h1 className="text-3xl font-bold text-center">لوحة تحكم المسوق</h1>
+    <div className="p-8 space-y-6 bg-gray-100 min-h-screen">
+      <h1 className="text-3xl font-bold text-center text-gray-800">لوحة تحكم المسوق</h1>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-2xl shadow p-4 text-center">
-          <h2 className="text-lg font-semibold">إجمالي المبيعات</h2>
-          <p className="text-2xl font-bold text-blue-600">{totalSales}</p>
-        </div>
-        <div className="bg-white rounded-2xl shadow p-4 text-center">
-          <h2 className="text-lg font-semibold">المبيعات المباشرة</h2>
-          <p className="text-2xl font-bold text-green-600">{directSales}</p>
-        </div>
-        <div className="bg-white rounded-2xl shadow p-4 text-center">
-          <h2 className="text-lg font-semibold">مبيعات الفريق A</h2>
-          <p className="text-2xl font-bold text-orange-500">{referralSales}</p>
-        </div>
-        <div className="bg-white rounded-2xl shadow p-4 text-center">
-          <h2 className="text-lg font-semibold">مبيعات الفريق B</h2>
-          <p className="text-2xl font-bold text-purple-500">{subReferralSales}</p>
-        </div>
-      </div>
+      {loading ? (
+        <p className="text-center">جاري تحميل البيانات...</p>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <Card className="hover:shadow-xl cursor-pointer">
+            <CardContent className="p-4">
+              <p className="text-lg font-semibold">إجمالي المبيعات</p>
+              <p className="text-3xl font-bold text-blue-600">{stats.totalSales}</p>
+            </CardContent>
+          </Card>
 
-      <div className="bg-white rounded-2xl shadow p-4">
-        <h2 className="text-lg font-semibold text-center mb-4">نسبة المبيعات حسب الحزمة</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={chartData}
-              dataKey="value"
-              nameKey="name"
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              fill="#8884d8"
-              label
-            >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-              ))}
-            </Pie>
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+          <Card className="hover:shadow-xl cursor-pointer">
+            <CardContent className="p-4">
+              <p className="text-lg font-semibold">المبيعات المباشرة</p>
+              <p className="text-3xl font-bold text-green-600">{stats.directSales}</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl cursor-pointer">
+            <CardContent className="p-4">
+              <p className="text-lg font-semibold">العمولة المباشرة</p>
+              <p className="text-3xl font-bold text-purple-600">{stats.totalCommission.toLocaleString()} ل.س</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl cursor-pointer">
+            <CardContent className="p-4">
+              <p className="text-lg font-semibold">عمولة الفريق A</p>
+              <p className="text-3xl font-bold text-indigo-600">{stats.teamACommission.toLocaleString()} ل.س</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl cursor-pointer">
+            <CardContent className="p-4">
+              <p className="text-lg font-semibold">عمولة الفريق B</p>
+              <p className="text-3xl font-bold text-pink-600">{stats.teamBCommission.toLocaleString()} ل.س</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl cursor-pointer">
+            <CardContent className="p-4">
+              <p className="text-lg font-semibold">العمولات المدفوعة</p>
+              <p className="text-3xl font-bold text-green-700">{stats.paidCommissions.toLocaleString()} ل.س</p>
+            </CardContent>
+          </Card>
+
+          <Card className="hover:shadow-xl cursor-pointer">
+            <CardContent className="p-4">
+              <p className="text-lg font-semibold">العمولات قيد الانتظار</p>
+              <p className="text-3xl font-bold text-red-600">{stats.pendingCommissions.toLocaleString()} ل.س</p>
+            </CardContent>
+          </Card>
+
+          <div className="col-span-1 md:col-span-2 xl:col-span-3 bg-white rounded-xl p-6 shadow-md">
+            <h2 className="text-xl font-semibold text-center mb-4">نسبة مبيعات الباقات</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie dataKey="value" data={stats.pieData} cx="50%" cy="50%" outerRadius={120} label>
+                  {stats.pieData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
