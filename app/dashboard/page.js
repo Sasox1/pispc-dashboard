@@ -3,9 +3,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import * as THREE from 'three';
-import FOG from 'vanta/dist/vanta.fog.min';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import FOG from 'vanta/dist/vanta.fog.min';
+import * as THREE from 'three';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -13,6 +13,7 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [marketerName, setMarketerName] = useState('');
   const [marketerTier, setMarketerTier] = useState('');
+
   const vantaRef = useRef(null);
   const vantaEffect = useRef(null);
 
@@ -20,18 +21,17 @@ export default function DashboardPage() {
     if (!vantaEffect.current && vantaRef.current) {
       vantaEffect.current = FOG({
         el: vantaRef.current,
-        THREE,
+        THREE: THREE,
         mouseControls: false,
         touchControls: false,
-        minHeight: 200.0,
-        minWidth: 200.0,
-        highlightColor: 0xffe8b5,
-        midtoneColor: 0x3b3b3b,
-        lowlightColor: 0x1a1a1a,
-        baseColor: 0x0a0a0a,
+        gyroControls: false,
+        highlightColor: 0xffddaa,
+        midtoneColor: 0x222222,
+        lowlightColor: 0x000000,
+        baseColor: 0x111111,
         blurFactor: 0.5,
-        speed: 1.2,
-        zoom: 1,
+        speed: 1.5,
+        zoom: 1
       });
     }
     return () => {
@@ -68,7 +68,7 @@ export default function DashboardPage() {
         setDebug(prev => prev + `\n✅ تم استلام البيانات من السيرفر بنجاح.\n📦 البيانات:\n${JSON.stringify(data.stats, null, 2)}`);
         setStats(data.stats);
         setMarketerName(data.stats.marketerName || '');
-        setMarketerTier(data.stats.marketerTier || '');
+        setMarketerTier(data.stats.marketerLevel || '');
       })
       .catch((err) => {
         console.error('❌ خطأ أثناء التحميل:', err);
@@ -103,15 +103,15 @@ export default function DashboardPage() {
   ];
 
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
-  const textColor = 'text-[#E0E0E0]';
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
-      className="relative p-8 space-y-8 min-h-screen bg-[#1A1A1A] text-[#E0E0E0] font-sans overflow-hidden">
-
-      {/* عنصر الخلفية المرتبط بـ VANTA */}
-      <div ref={vantaRef} className="absolute top-0 left-0 w-full h-full -z-10" />
-
+    <motion.div
+      ref={vantaRef}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="relative p-8 space-y-8 min-h-screen text-[#E0E0E0] font-sans overflow-hidden"
+    >
       <div className="relative z-10 flex items-center justify-between">
         <div className="relative">
           <Image src="/logo.png" alt="PISPC Logo" width={260} height={260} />
