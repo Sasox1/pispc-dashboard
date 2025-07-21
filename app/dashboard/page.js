@@ -174,7 +174,7 @@ function TeamCard({ label, members }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }}
       className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-2xl p-6">
-      <div className="text-[#FFD700] font-semibold mb-2">{label}</div>
+      <div className="text-[#E0E0E0] font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
         <ul className="list-disc list-inside text-[#E0E0E0] space-y-1">
           {members.map((m, i) => (
