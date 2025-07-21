@@ -28,7 +28,11 @@ export default function DashboardPage() {
       })
       .then((data) => {
         console.log('✅ البيانات المستلمة من السيرفر:', data);
-        setDebug(prev => prev + `\n✅ تم استلام البيانات من السيرفر بنجاح.`);
+        if (!data.stats) {
+          setError('❌ لم يتم استلام بيانات صالحة من السيرفر.');
+          return;
+        }
+        setDebug(prev => prev + `\n✅ تم استلام البيانات من السيرفر بنجاح.\n📦 البيانات:\n${JSON.stringify(data.stats, null, 2)}`);
         setStats(data.stats);
       })
       .catch((err) => {
@@ -38,11 +42,23 @@ export default function DashboardPage() {
   }, []);
 
   if (error) {
-    return <div className="p-8 text-red-600 font-bold whitespace-pre-wrap">{error}\n{debug}</div>;
+    return (
+      <div className="p-8 text-red-600 font-bold whitespace-pre-wrap">
+        {error}
+        {'\n\n'}
+        {debug}
+      </div>
+    );
   }
 
   if (!stats) {
-    return <div className="p-8 text-gray-500 animate-pulse whitespace-pre-wrap">⏳ جاري تحميل البيانات...\n{debug}</div>;
+    return (
+      <div className="p-8 text-gray-500 animate-pulse whitespace-pre-wrap">
+        ⏳ جاري تحميل البيانات...
+        {'\n\n'}
+        {debug}
+      </div>
+    );
   }
 
   return (
@@ -69,6 +85,7 @@ export default function DashboardPage() {
       {/* ✅ DEBUG SECTION */}
       <div className="mt-10 bg-gray-100 p-4 rounded-xl text-xs text-gray-600 whitespace-pre-wrap">
         🛠️ <strong>معلومات تصحيحية (Debug Info):</strong>
+        {'\n'}
         {debug}
       </div>
     </div>
