@@ -65,15 +65,16 @@ export default function DashboardPage() {
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
 
   return (
-    <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0] bg-[#243d6e]">
+    <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
+      {/* خلفية جديدة بلون #0c1326 مع شعاع خلف اللوجو */}
+      <div className="absolute inset-0 -z-10 bg-[#0c1326]">
+        <div className="absolute top-0 left-0 w-[420px] h-[200px] bg-white/40 blur-3xl rounded-full opacity-90 shadow-[0_0_100px_80px_rgba(255,255,255,0.3)] pointer-events-none" />
+      </div>
+
       {/* المحتوى */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
-        <div className="flex items-center justify-between relative">
-          <div className="relative">
-            <Image src="/logo.png" alt="PISPC Logo" width={360} height={360} />
-            {/* تأثير ضوء أقوى خلف اللوجو */}
-            <div className="absolute top-0 left-0 w-[600px] h-[180px] bg-yellow-200/30 blur-3xl opacity-70 -z-10" />
-          </div>
+        <div className="flex items-center justify-between">
+          <Image src="/logo.png" alt="PISPC Logo" width={360} height={360} />
           <div className="flex flex-col gap-2">
             <div className="bg-white/10 border border-white/20 shadow px-6 py-3 rounded-xl text-sm">
               <div className="font-bold">{marketerName}</div>
