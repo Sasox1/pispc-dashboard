@@ -4,7 +4,9 @@ import { useEffect, useState, Suspense, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Canvas } from '@react-three/fiber';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Environment, Lightformer } from '@react-three/drei';
+import * as THREE from 'three';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -63,15 +65,14 @@ export default function DashboardPage() {
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
 
   return (
-    <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
-      {/* خلفية مضيئة خلف اللوجو */}
-      <div className="absolute left-0 top-0 w-full h-60 z-0 pointer-events-none">
-        <div className="absolute left-0 top-0 h-full w-2/3 bg-gradient-to-r from-yellow-300/40 via-yellow-100/20 to-transparent blur-3xl opacity-60" style={{ height: '130px' }} />
-      </div>
-
+    <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0] bg-[#1A1A1A]">
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
-        <div className="flex items-center justify-between">
-          <Image src="/logo.png" alt="PISPC Logo" width={360} height={360} />
+        <div className="relative flex items-center justify-between">
+          <div className="relative">
+            <Image src="/logo.png" alt="PISPC Logo" width={360} height={360} />
+            <div className="absolute left-0 top-0 w-[600px] h-[140px] bg-yellow-100/10 blur-3xl rounded-full" style={{ transform: 'translateX(-30%) translateY(20%)' }} />
+          </div>
+
           <div className="flex flex-col gap-2">
             <div className="bg-white/10 border border-white/20 shadow px-6 py-3 rounded-xl text-sm">
               <div className="font-bold">{marketerName}</div>
