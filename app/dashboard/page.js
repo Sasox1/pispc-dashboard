@@ -1,11 +1,37 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls } from '@react-three/drei';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import FOG from 'vanta/dist/vanta.fog.min';
 import * as THREE from 'three';
+
+function AnimatedBackground() {
+  return (
+    <Canvas
+      className="absolute top-0 left-0 w-full h-full z-0"
+      camera={{ position: [0, 0, 10], fov: 50 }}
+    >
+      <ambientLight intensity={0.5} />
+      <pointLight position={[10, 10, 10]} intensity={1.5} color={"#fff8e7"} />
+      <mesh rotation={[Math.PI / 4, Math.PI / 4, 0]}>
+        <icosahedronGeometry args={[4, 3]} />
+        <meshPhysicalMaterial
+          transmission={1}
+          roughness={0.3}
+          thickness={1.5}
+          clearcoat={1}
+          metalness={0.2}
+          reflectivity={0.8}
+          color="#ffffff"
+        />
+      </mesh>
+      <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={0.2} />
+    </Canvas>
+  );
+}
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -13,31 +39,6 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [marketerName, setMarketerName] = useState('');
   const [marketerTier, setMarketerTier] = useState('');
-
-  const vantaRef = useRef(null);
-  const vantaEffect = useRef(null);
-
-  useEffect(() => {
-    if (!vantaEffect.current && vantaRef.current) {
-      vantaEffect.current = FOG({
-        el: vantaRef.current,
-        THREE: THREE,
-        mouseControls: false,
-        touchControls: false,
-        gyroControls: false,
-        highlightColor: 0xffddaa,
-        midtoneColor: 0x222222,
-        lowlightColor: 0x000000,
-        baseColor: 0x111111,
-        blurFactor: 0.5,
-        speed: 1.5,
-        zoom: 1
-      });
-    }
-    return () => {
-      if (vantaEffect.current) vantaEffect.current.destroy();
-    };
-  }, []);
 
   useEffect(() => {
     const marketerId = sessionStorage.getItem('marketerId');
@@ -68,7 +69,7 @@ export default function DashboardPage() {
         setDebug(prev => prev + `\n✅ تم استلام البيانات من السيرفر بنجاح.\n📦 البيانات:\n${JSON.stringify(data.stats, null, 2)}`);
         setStats(data.stats);
         setMarketerName(data.stats.marketerName || '');
-        setMarketerTier(data.stats.marketerLevel || '');
+        setMarketerTier(data.stats.marketerTier || '');
       })
       .catch((err) => {
         console.error('❌ خطأ أثناء التحميل:', err);
@@ -103,15 +104,14 @@ export default function DashboardPage() {
   ];
 
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
+  const textColor = 'text-[#E0E0E0]';
 
   return (
-    <motion.div
-      ref={vantaRef}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-      className="relative p-8 space-y-8 min-h-screen text-[#E0E0E0] font-sans overflow-hidden"
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
+      className="relative p-8 space-y-8 min-h-screen bg-[#1A1A1A] text-[#E0E0E0] font-sans overflow-hidden">
+
+      <AnimatedBackground />
+
       <div className="relative z-10 flex items-center justify-between">
         <div className="relative">
           <Image src="/logo.png" alt="PISPC Logo" width={260} height={260} />
