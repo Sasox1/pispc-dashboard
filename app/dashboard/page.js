@@ -1,5 +1,8 @@
 'use client';
+
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -19,63 +22,48 @@ export default function DashboardPage() {
 
     fetch('/api/dashboard', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ marketerId })
     })
-      .then((res) => {
+      .then(res => {
         if (!res.ok) throw new Error('❌ فشل في تحميل البيانات من API');
         return res.json();
       })
-      .then((data) => {
-        console.log('✅ البيانات المستلمة من السيرفر:', data);
+      .then(data => {
         if (!data.stats) {
           setError('❌ لم يتم استلام بيانات صالحة من السيرفر.');
           return;
         }
-        setDebug(prev => prev + `\n✅ تم استلام البيانات من السيرفر بنجاح.\n📦 البيانات:\n${JSON.stringify(data.stats, null, 2)}`);
+        setDebug(prev => prev + `\n✅ تم استلام البيانات من السيرفر بنجاح.`);
         setStats(data.stats);
         setMarketerName(data.stats.marketerName || '');
         setMarketerTier(data.stats.marketerTier || '');
       })
-      .catch((err) => {
+      .catch(err => {
         console.error('❌ خطأ أثناء التحميل:', err);
         setError('❌ فشل في تحميل البيانات من السيرفر');
       });
   }, []);
 
   if (error) {
-    return (
-      <div className="p-8 text-red-600 font-bold whitespace-pre-wrap">
-        {error}
-        {'\n\n'}
-        {debug}
-      </div>
-    );
+    return <div className="p-8 text-red-600 font-bold whitespace-pre-wrap">{error}{'\n\n'}{debug}</div>;
   }
 
   if (!stats) {
-    return (
-      <div className="p-8 text-gray-500 animate-pulse whitespace-pre-wrap">
-        ⏳ جاري تحميل البيانات...
-        {'\n\n'}
-        {debug}
-      </div>
-    );
+    return <div className="p-8 text-gray-400 animate-pulse whitespace-pre-wrap">⏳ جاري تحميل البيانات...\n\n{debug}</div>;
   }
 
   return (
-    <div className="p-8 space-y-6 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen text-white font-mono">
-      <div className="flex items-center justify-between">
-        <img src="/logo.png" alt="PISPC Logo" className="h-12" />
-        <div className="text-right">
-          <div className="text-sm">اسم المسوق: <span className="text-green-400 font-bold">{marketerName}</span></div>
-          <div className="text-sm">الطبقة: <span className="text-cyan-400 font-bold">{marketerTier}</span></div>
+    <div className="bg-gradient-to-tr from-black via-[#0f0f2d] to-[#1a1a40] min-h-screen text-white p-6 font-sans">
+      <div className="flex items-center justify-between mb-6">
+        <Image src="/logo.png" alt="PISPC Logo" width={60} height={60} />
+        <div className="text-right text-sm space-y-1">
+          <div>اسم المسوق: <span className="text-teal-400 font-bold">{marketerName}</span></div>
+          <div>الطبقة: <span className="text-indigo-400 font-bold">{marketerTier}</span></div>
         </div>
       </div>
 
-      <h1 className="text-xl font-bold text-purple-400 border-b border-purple-700 pb-2">📊 لوحة تحكم المسوق</h1>
+      <h1 className="text-lg font-bold text-fuchsia-400 border-b border-fuchsia-700 pb-2 mb-6">📊 لوحة تحكم المسوق</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard title="العمولة المباشرة" value={stats.totalDirectCommission + ' SP'} icon="💼" />
@@ -94,10 +82,9 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="mt-10 bg-gray-900 p-4 rounded-xl text-xs text-gray-400 whitespace-pre-wrap border border-purple-700">
+      <div className="mt-10 bg-black/30 backdrop-blur-md p-4 rounded-xl text-xs text-gray-300 whitespace-pre-wrap border border-purple-600">
         🛠️ <strong>معلومات تصحيحية (Debug Info):</strong>
-        {'\n'}
-        {debug}
+        {'\n'}{debug}
       </div>
     </div>
   );
@@ -105,18 +92,28 @@ export default function DashboardPage() {
 
 function StatCard({ title, value, icon }) {
   return (
-    <div className="bg-gray-950 border border-purple-700 rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
-      <div className="text-sm text-purple-300 mb-1 flex items-center gap-2">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="bg-white/5 backdrop-blur-lg border border-fuchsia-600 rounded-3xl p-6 shadow-xl hover:shadow-fuchsia-700 transition duration-300"
+    >
+      <div className="text-sm text-fuchsia-300 mb-1 flex items-center gap-2">
         <span className="text-lg">{icon}</span> {title}
       </div>
       <div className="text-2xl font-bold text-white">{value}</div>
-    </div>
+    </motion.div>
   );
 }
 
 function TeamCard({ label, members }) {
   return (
-    <div className="bg-gray-950 border border-cyan-700 rounded-2xl shadow p-6">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="bg-white/5 backdrop-blur-md border border-cyan-700 rounded-3xl p-6 shadow-md"
+    >
       <div className="text-cyan-300 font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
         <ul className="list-disc list-inside text-white space-y-1">
@@ -127,6 +124,6 @@ function TeamCard({ label, members }) {
       ) : (
         <p className="text-gray-500 italic">لا يوجد أعضاء</p>
       )}
-    </div>
+    </motion.div>
   );
 }
