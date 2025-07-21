@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense, useRef } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -62,8 +62,10 @@ export default function DashboardPage() {
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
 
   return (
-    <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
-      {/* المحتوى فوق الخلفية */}
+    <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0] bg-gray-800">
+      {/* خلفية سداسية متفاعلة */}
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_10px_10px,#3a3a3a_1px,transparent_1px)] [background-size:40px_40px] opacity-20 pointer-events-none"></div>
+
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
         <div className="flex items-center justify-between">
           <Image src="/logo.png" alt="PISPC Logo" width={180} height={180} />
