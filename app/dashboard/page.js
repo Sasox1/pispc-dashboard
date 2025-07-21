@@ -5,6 +5,8 @@ export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [debug, setDebug] = useState('');
   const [error, setError] = useState('');
+  const [marketerName, setMarketerName] = useState('');
+  const [marketerTier, setMarketerTier] = useState('');
 
   useEffect(() => {
     const marketerId = sessionStorage.getItem('marketerId');
@@ -34,6 +36,8 @@ export default function DashboardPage() {
         }
         setDebug(prev => prev + `\n✅ تم استلام البيانات من السيرفر بنجاح.\n📦 البيانات:\n${JSON.stringify(data.stats, null, 2)}`);
         setStats(data.stats);
+        setMarketerName(data.stats.marketerName || '');
+        setMarketerTier(data.stats.marketerTier || '');
       })
       .catch((err) => {
         console.error('❌ خطأ أثناء التحميل:', err);
@@ -62,8 +66,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="p-8 space-y-6 bg-gradient-to-br from-gray-50 to-white min-h-screen">
-      <h1 className="text-4xl font-extrabold text-gray-800 border-b pb-4">📊 لوحة تحكم المسوق</h1>
+    <div className="p-8 space-y-6 bg-gradient-to-br from-black via-gray-900 to-gray-800 min-h-screen text-white font-mono">
+      <div className="flex items-center justify-between">
+        <img src="/logo.png" alt="PISPC Logo" className="h-12" />
+        <div className="text-right">
+          <div className="text-sm">اسم المسوق: <span className="text-green-400 font-bold">{marketerName}</span></div>
+          <div className="text-sm">الطبقة: <span className="text-cyan-400 font-bold">{marketerTier}</span></div>
+        </div>
+      </div>
+
+      <h1 className="text-xl font-bold text-purple-400 border-b border-purple-700 pb-2">📊 لوحة تحكم المسوق</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard title="العمولة المباشرة" value={stats.totalDirectCommission + ' SP'} icon="💼" />
@@ -75,15 +87,14 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-10">
-        <h2 className="text-2xl font-bold mb-4">🧑‍🤝‍🧑 فريقك:</h2>
+        <h2 className="text-lg font-bold mb-4 text-pink-400">🧑‍🤝‍🧑 فريقك:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TeamCard label="فريق A (الإحالة المباشرة)" members={stats.teamA} />
           <TeamCard label="فريق B (إحالة الإحالة)" members={stats.teamB} />
         </div>
       </div>
 
-      {/* ✅ DEBUG SECTION */}
-      <div className="mt-10 bg-gray-100 p-4 rounded-xl text-xs text-gray-600 whitespace-pre-wrap">
+      <div className="mt-10 bg-gray-900 p-4 rounded-xl text-xs text-gray-400 whitespace-pre-wrap border border-purple-700">
         🛠️ <strong>معلومات تصحيحية (Debug Info):</strong>
         {'\n'}
         {debug}
@@ -94,27 +105,27 @@ export default function DashboardPage() {
 
 function StatCard({ title, value, icon }) {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
-      <div className="text-sm text-gray-500 mb-1 flex items-center gap-2">
+    <div className="bg-gray-950 border border-purple-700 rounded-2xl shadow-lg p-6 hover:shadow-xl transition duration-300">
+      <div className="text-sm text-purple-300 mb-1 flex items-center gap-2">
         <span className="text-lg">{icon}</span> {title}
       </div>
-      <div className="text-2xl font-bold text-gray-800">{value}</div>
+      <div className="text-2xl font-bold text-white">{value}</div>
     </div>
   );
 }
 
 function TeamCard({ label, members }) {
   return (
-    <div className="bg-white rounded-2xl shadow p-6">
-      <div className="text-gray-600 font-semibold mb-2">{label}</div>
+    <div className="bg-gray-950 border border-cyan-700 rounded-2xl shadow p-6">
+      <div className="text-cyan-300 font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
-        <ul className="list-disc list-inside text-gray-700 space-y-1">
+        <ul className="list-disc list-inside text-white space-y-1">
           {members.map((m, i) => (
             <li key={i}>{m}</li>
           ))}
         </ul>
       ) : (
-        <p className="text-gray-400 italic">لا يوجد أعضاء</p>
+        <p className="text-gray-500 italic">لا يوجد أعضاء</p>
       )}
     </div>
   );
