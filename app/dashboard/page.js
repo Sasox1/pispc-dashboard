@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Float, Sphere, MeshDistortMaterial } from '@react-three/drei';
+import { Environment, Lightformer } from '@react-three/drei';
 import * as THREE from 'three';
 
 export default function DashboardPage() {
@@ -66,15 +66,17 @@ export default function DashboardPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
+      {/* خلفية ثلاثية الأبعاد زجاجية */}
       <div className="absolute inset-0 -z-10">
         <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
           <Suspense fallback={null}>
-            <MovingLights count={5} />
-            <GlassPanel />
+            <Lights />
+            <GlassBackdrop />
           </Suspense>
         </Canvas>
       </div>
 
+      {/* المحتوى فوق الخلفية */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
         <div className="flex items-center justify-between">
           <Image src="/logo.png" alt="PISPC Logo" width={180} height={180} />
@@ -159,46 +161,45 @@ function TeamCard({ label, members }) {
   );
 }
 
-function GlassPanel() {
-  const meshRef = useRef();
-  useFrame((state, delta) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.05;
-    }
-  });
-
+function GlassBackdrop() {
   return (
-    <mesh ref={meshRef} scale={[15, 10, 1]} position={[0, 0, -1]}>
-      <icosahedronGeometry args={[1.5, 5]} />
+    <mesh scale={[40, 25, 0.5]}>
+      <dodecahedronGeometry args={[3, 1]} />
       <meshPhysicalMaterial
-        transmission={0.3}
+        transmission={0.6}
         roughness={0.9}
-        thickness={5}
-        ior={2.4}
+        thickness={3}
         clearcoat={1}
-        metalness={0.1}
-        reflectivity={0.5}
-        color="#aeeaff"
+        reflectivity={1}
+        metalness={0.25}
+        envMapIntensity={2}
+        color="#cce6ff"
       />
     </mesh>
   );
 }
 
-function MovingLights({ count = 5 }) {
-  const lights = new Array(count).fill().map((_, i) => (
-    <Float key={i} speed={0.2} rotationIntensity={0.5} floatIntensity={0.5}>
-      <Sphere args={[1.8, 32, 32]}>
-        <MeshDistortMaterial
-          color="#ffffcc"
-          emissive="#ffffcc"
-          emissiveIntensity={2}
-          speed={1}
-          roughness={0.4}
-          transparent
-          opacity={0.15}
-        />
-      </Sphere>
-    </Float>
-  ));
-  return <group>{lights}</group>;
+function Lights() {
+  const groupRef = useRef();
+  const spheres = new Array(5).fill().map((_, i) => useRef());
+
+  useFrame((state, delta) => {
+    spheres.forEach((ref, i) => {
+      if (ref.current) {
+        ref.current.position.x = Math.sin(state.clock.elapsedTime * 0.3 + i) * 10;
+        ref.current.position.y = Math.cos(state.clock.elapsedTime * 0.4 + i) * 5;
+      }
+    });
+  });
+
+  return (
+    <group ref={groupRef}>
+      {spheres.map((ref, i) => (
+        <mesh ref={ref} key={i}>
+          <sphereGeometry args={[1.5, 32, 32]} />
+          <meshBasicMaterial color="#ffe599" transparent opacity={0.25} />
+        </mesh>
+      ))}
+    </group>
+  );
 }
