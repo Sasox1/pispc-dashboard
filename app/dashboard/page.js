@@ -4,6 +4,8 @@ import { useEffect, useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import * as THREE from 'three';
+import FOG from 'vanta/dist/vanta.fog.min';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -11,7 +13,32 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [marketerName, setMarketerName] = useState('');
   const [marketerTier, setMarketerTier] = useState('');
-  const canvasRef = useRef(null);
+
+  const vantaRef = useRef(null);
+  const vantaEffect = useRef(null);
+
+  useEffect(() => {
+    if (!vantaEffect.current) {
+      vantaEffect.current = FOG({
+        el: vantaRef.current,
+        THREE,
+        mouseControls: false,
+        touchControls: false,
+        minHeight: 200.0,
+        minWidth: 200.0,
+        highlightColor: 0xfff4da,
+        midtoneColor: 0x1a1a1a,
+        lowlightColor: 0x1a1a1a,
+        baseColor: 0x0d0d0d,
+        blurFactor: 0.5,
+        speed: 0.5,
+        zoom: 0.9
+      });
+    }
+    return () => {
+      if (vantaEffect.current?.destroy) vantaEffect.current.destroy();
+    };
+  }, []);
 
   useEffect(() => {
     const marketerId = sessionStorage.getItem('marketerId');
@@ -49,41 +76,6 @@ export default function DashboardPage() {
       });
   }, []);
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    let lights = Array.from({ length: 10 }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      r: 80 + Math.random() * 40,
-      dx: (Math.random() - 0.5) * 0.5,
-      dy: (Math.random() - 0.5) * 0.5,
-    }));
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      lights.forEach((light) => {
-        ctx.beginPath();
-        const gradient = ctx.createRadialGradient(light.x, light.y, 0, light.x, light.y, light.r);
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
-        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
-        ctx.fillStyle = gradient;
-        ctx.arc(light.x, light.y, light.r, 0, Math.PI * 2);
-        ctx.fill();
-        light.x += light.dx;
-        light.y += light.dy;
-
-        if (light.x < 0 || light.x > canvas.width) light.dx *= -1;
-        if (light.y < 0 || light.y > canvas.height) light.dy *= -1;
-      });
-      requestAnimationFrame(animate);
-    };
-    animate();
-  }, []);
-
   if (error) {
     return (
       <div className="p-8 text-red-600 font-bold whitespace-pre-wrap">
@@ -113,12 +105,13 @@ export default function DashboardPage() {
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
 
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
-      className="relative p-8 space-y-8 min-h-screen bg-[#1A1A1A] text-white font-sans overflow-hidden">
+    <motion.div ref={vantaRef} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
+      className="relative p-8 space-y-8 min-h-screen text-white font-sans overflow-hidden">
 
-      <canvas ref={canvasRef} className="absolute top-0 left-0 w-full h-full z-0" />
-
-      {/* باقي المكونات تظهر هنا... */}
+      {/* محتوى الصفحة داخل z-10 */}
+      <div className="relative z-10">
+        {/* ... باقي المحتوى يبقى كما هو ... */}
+      </div>
     </motion.div>
   );
 }
@@ -137,7 +130,7 @@ function TeamCard({ label, members }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }}
       className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-2xl p-6">
-      <div className="text-gray-200 font-semibold mb-2">{label}</div>
+      <div className="text-white font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
         <ul className="list-disc list-inside text-white space-y-1">
           {members.map((m, i) => (
