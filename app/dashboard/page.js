@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { Canvas } from '@react-three/fiber';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -62,14 +63,12 @@ export default function DashboardPage() {
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
 
   return (
-    <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0] bg-gray-800">
-      {/* خلفية سداسية بسيطة */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(#3a3a3a_1px,transparent_1px)] [background-size:40px_40px] opacity-30"></div>
+    <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
+      {/* خلفية مضيئة خلف اللوجو */}
+      <div className="absolute left-0 top-0 w-full h-60 z-0 pointer-events-none">
+        <div className="absolute left-0 top-0 h-full w-2/3 bg-gradient-to-r from-yellow-300/40 via-yellow-100/20 to-transparent blur-3xl opacity-60" style={{ height: '130px' }} />
+      </div>
 
-      {/* ضوء خلف اللوجو يمتد نحو اسم المسوق */}
-      <div className="absolute top-12 left-12 w-[300px] h-[100px] bg-gradient-to-r from-yellow-300/40 via-yellow-100/20 to-transparent blur-2xl z-0"></div>
-
-      {/* المحتوى */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
         <div className="flex items-center justify-between">
           <Image src="/logo.png" alt="PISPC Logo" width={360} height={360} />
