@@ -63,12 +63,16 @@ export default function DashboardPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0] bg-gray-800">
-      {/* خلفية سداسية متفاعلة */}
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_10px_10px,#3a3a3a_1px,transparent_1px)] [background-size:40px_40px] opacity-20 pointer-events-none"></div>
+      {/* خلفية سداسية بسيطة */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(#3a3a3a_1px,transparent_1px)] [background-size:40px_40px] opacity-30"></div>
 
+      {/* ضوء خلف اللوجو يمتد نحو اسم المسوق */}
+      <div className="absolute top-12 left-12 w-[300px] h-[100px] bg-gradient-to-r from-yellow-300/40 via-yellow-100/20 to-transparent blur-2xl z-0"></div>
+
+      {/* المحتوى */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
         <div className="flex items-center justify-between">
-          <Image src="/logo.png" alt="PISPC Logo" width={180} height={180} />
+          <Image src="/logo.png" alt="PISPC Logo" width={360} height={360} />
           <div className="flex flex-col gap-2">
             <div className="bg-white/10 border border-white/20 shadow px-6 py-3 rounded-xl text-sm">
               <div className="font-bold">{marketerName}</div>
