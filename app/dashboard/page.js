@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Lightformer } from '@react-three/drei';
+import { Environment, Lightformer, Sphere, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 export default function DashboardPage() {
@@ -68,15 +68,15 @@ export default function DashboardPage() {
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
       {/* خلفية ثلاثية الأبعاد زجاجية */}
       <div className="absolute inset-0 -z-10">
-        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-          <ambientLight intensity={0.4} />
+        <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
+          <ambientLight intensity={0.5} />
           <pointLight position={[10, 10, 10]} intensity={2} />
           <Suspense fallback={null}>
-            <Environment resolution={256}>
-              <Lightformer intensity={2} position={[0, 2, -5]} scale={[10, 10]} />
-              <Lightformer intensity={1} position={[-5, -2, -10]} scale={[20, 10]} color="#ffaa00" />
+            <Environment resolution={128}>
+              <Lightformer intensity={1.5} position={[0, 5, -10]} scale={[10, 10]} />
             </Environment>
             <GlassPanel />
+            <MovingLights />
           </Suspense>
         </Canvas>
       </div>
@@ -166,29 +166,40 @@ function TeamCard({ label, members }) {
   );
 }
 
-// 🎯 مكون اللوح الزجاجي الشفاف
 function GlassPanel() {
   const meshRef = useRef();
 
   useFrame((state, delta) => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += delta * 0.1;
+      meshRef.current.rotation.y += delta * 0.05;
     }
   });
 
   return (
-    <mesh ref={meshRef} scale={[10, 10, 0.5]}>
-      <icosahedronGeometry args={[1, 5]} />
+    <mesh ref={meshRef} scale={[12, 12, 1]} position={[0, 0, -1]}>
+      <icosahedronGeometry args={[1.4, 6]} />
       <meshPhysicalMaterial
         transmission={1}
-        roughness={0.15}
-        thickness={1}
-        clearcoat={0.8}
-        metalness={0.1}
-        reflectivity={0.9}
+        roughness={0.9}
+        thickness={5}
+        clearcoat={1}
+        metalness={0.2}
+        reflectivity={0.7}
         envMapIntensity={2}
         color="#ffffff"
+        ior={2.5}
       />
     </mesh>
   );
+}
+
+function MovingLights() {
+  const balls = new Array(10).fill(0);
+  return balls.map((_, i) => (
+    <Float key={i} speed={0.4} rotationIntensity={1} floatIntensity={2}>
+      <Sphere args={[0.1, 16, 16]} position={[Math.random() * 6 - 3, Math.random() * 6 - 3, Math.random() * -5 - 1]}>
+        <meshStandardMaterial emissive="#ffeeaa" emissiveIntensity={2} color="#000000" transparent opacity={0.5} />
+      </Sphere>
+    </Float>
+  ));
 }
