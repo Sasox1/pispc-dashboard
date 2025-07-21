@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, Suspense, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
@@ -168,8 +168,10 @@ function TeamCard({ label, members }) {
 
 // 🎯 مكون اللوح الزجاجي الشفاف
 function GlassPanel() {
-  const meshRef = useFrame((state, delta) => {
-    if (state.scene && state.clock) {
+  const meshRef = useRef();
+
+  useFrame((state, delta) => {
+    if (meshRef.current) {
       meshRef.current.rotation.y += delta * 0.1;
     }
   });
