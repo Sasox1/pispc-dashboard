@@ -32,28 +32,26 @@ export async function POST(req) {
     console.log('📩 Received marketerId:', marketerId);
 
     const [commissions, users, pyramid, upgrades] = await Promise.all([
-      getSheetData('توزيع العمولات'),
-      getSheetData('المستخدمين'),
-      getSheetData('الهرم'),
-      getSheetData('سجل الترقية'),
+      getSheetData('توزيع العمولات'),   // العمود A = ID
+      getSheetData('المستخدمين'),       // العمود C = ID
+      getSheetData('الهرم'),             // العمود A = ID
+      getSheetData('سجل الترقية'),       // العمود B = ID
     ]);
 
-    const data = commissions.filter(row => row[0] && row[0] !== 'ID');
+    const cleanedCommissions = commissions.filter(row => row[0] && row[0] !== 'ID');
 
-    console.log(`📊 Found ${data.length} commission entries`);
+    const directSales = cleanedCommissions.filter(row => row[0] === marketerId && row[2] === '✓');
+    const referralSales = cleanedCommissions.filter(row => row[0] === marketerId && row[3] === '✓');
+    const referralOfReferralSales = cleanedCommissions.filter(row => row[0] === marketerId && row[4] === '✓');
 
-    const directSales = data.filter(row => row[0] === marketerId && row[2] === '✓');
-    const referralSales = data.filter(row => row[0] === marketerId && row[3] === '✓');
-    const referralOfReferralSales = data.filter(row => row[0] === marketerId && row[4] === '✓');
+    const totalPaid = cleanedCommissions.filter(row => row[0] === marketerId && row[11] === '✓').length;
+    const totalPending = cleanedCommissions.filter(row => row[0] === marketerId && row[11] !== '✓').length;
 
-    const totalPaid = data.filter(row => row[0] === marketerId && row[11] === '✓').length;
-    const totalPending = data.filter(row => row[0] === marketerId && row[11] !== '✓').length;
+    const upgradeRecords = upgrades.filter(row => row[1] === marketerId); // سجل الترقية - العمود B
 
-    const upgradeRecords = upgrades.filter(row => row[1] === marketerId);
-
-    const pyramidRow = pyramid.find(row => row[0] === marketerId);
-    const teamA = pyramidRow?.[2]?.split(',').filter(Boolean) || [];
-    const teamB = pyramidRow?.[3]?.split(',').filter(Boolean) || [];
+    const pyramidRow = pyramid.find(row => row[0] === marketerId); // الهرم - العمود A
+    const teamA = pyramidRow?.[2]?.split(',').map(e => e.trim()).filter(Boolean) || [];
+    const teamB = pyramidRow?.[3]?.split(',').map(e => e.trim()).filter(Boolean) || [];
 
     const response = {
       stats: {
