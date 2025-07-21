@@ -83,22 +83,26 @@ export default function DashboardPage() {
 
       {/* خلفية ضوئية ممتدة */}
       <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
-        <div className="absolute top-10 left-10 w-[600px] h-[600px] bg-gradient-to-br from-white/20 to-yellow-100/10 rounded-full blur-3xl opacity-30 animate-pulse" style={{ transform: 'rotate(20deg)' }} />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-white/80 via-yellow-100/40 to-transparent blur-[120px] opacity-60" />
       </div>
 
       <div className="relative z-10 flex items-center justify-between">
         <div className="relative">
-          <Image src="/logo.png" alt="PISPC Logo" width={120} height={120} />
-          <div className="absolute top-0 left-0 w-full h-full rounded-full bg-white/20 blur-2xl opacity-40" />
+          <Image src="/logo.png" alt="PISPC Logo" width={240} height={240} className="z-10 relative" />
+          <div className="absolute top-0 left-0 w-full h-full rounded-full bg-white/40 blur-3xl opacity-90" />
         </div>
-        <div className="backdrop-blur-md bg-white/10 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.2)] px-6 py-3 rounded-xl text-sm">
-          <div className="text-white font-bold">{marketerName}</div>
-          <div className="text-[#FFD700]">{marketerTier}</div>
+        <div className="flex flex-col gap-2">
+          <div className="backdrop-blur-lg bg-white/10 border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.3)] px-6 py-3 rounded-xl text-sm">
+            <div className="text-white font-bold">{marketerName}</div>
+          </div>
+          <div className="backdrop-blur-lg bg-white/10 border border-yellow-300/30 shadow-[0_0_15px_rgba(255,215,0,0.3)] px-6 py-2 rounded-xl text-xs text-yellow-300 font-medium">
+            {marketerTier}
+          </div>
         </div>
       </div>
 
-      <div className="backdrop-blur-md bg-white/10 border border-[#FFD700]/20 rounded-2xl p-6 shadow-lg">
-        <h1 className="text-2xl font-bold text-white tracking-wide">📊 لوحة تحكم المسوق</h1>
+      <div className="backdrop-blur-lg bg-white/10 border border-[#FFD700]/20 rounded-2xl py-2 px-6 shadow-xl text-center w-full">
+        <h1 className="text-base font-semibold text-white tracking-wide">لوحة تحكم المسوق</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -155,7 +159,7 @@ export default function DashboardPage() {
 function StatCard({ title, value, children }) {
   return (
     <motion.div whileHover={{ scale: 1.03 }}
-      className="backdrop-blur-md bg-white/10 border border-white/10 rounded-2xl shadow-lg p-6 transition duration-300 hover:shadow-[0_0_30px_#FFD70022]">
+      className="backdrop-blur-xl bg-white/10 border border-white/10 rounded-2xl shadow-lg p-6 transition duration-300 hover:shadow-[0_0_30px_#FFD70022]">
       <div className="text-sm text-white/80 mb-1 font-medium">{title}</div>
       {value ? <div className="text-2xl font-bold text-white">{value}</div> : children}
     </motion.div>
@@ -165,7 +169,7 @@ function StatCard({ title, value, children }) {
 function TeamCard({ label, members }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }}
-      className="backdrop-blur-md bg-white/10 border border-white/10 rounded-2xl p-6">
+      className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-2xl p-6">
       <div className="text-[#FFD700] font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
         <ul className="list-disc list-inside text-white space-y-1">
