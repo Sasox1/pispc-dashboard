@@ -81,28 +81,31 @@ export default function DashboardPage() {
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
       className="relative p-8 space-y-8 min-h-screen bg-[#1A1A1A] text-white font-sans overflow-hidden">
 
-      {/* خلفية ضوئية ممتدة */}
       <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-white/80 via-yellow-100/40 to-transparent blur-[120px] opacity-60" />
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-white/40 via-yellow-100/20 to-transparent blur-3xl opacity-50" />
       </div>
 
       <div className="relative z-10 flex items-center justify-between">
         <div className="relative">
-          <Image src="/logo.png" alt="PISPC Logo" width={240} height={240} className="z-10 relative" />
-          <div className="absolute top-0 left-0 w-full h-full rounded-full bg-white/40 blur-3xl opacity-90" />
+          <Image src="/logo.png" alt="PISPC Logo" width={280} height={280} />
+          <div className="absolute top-0 left-0 w-full h-full rounded-full bg-white/30 blur-2xl opacity-70" />
         </div>
         <div className="flex flex-col gap-2">
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.3)] px-6 py-3 rounded-xl text-sm">
-            <div className="text-white font-bold">{marketerName}</div>
+          <div className="backdrop-blur-lg bg-white/10 border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.3)] px-6 py-3 rounded-xl text-sm text-white">
+            <div className="font-bold">{marketerName}</div>
           </div>
-          <div className="backdrop-blur-lg bg-white/10 border border-yellow-300/30 shadow-[0_0_15px_rgba(255,215,0,0.3)] px-6 py-2 rounded-xl text-xs text-yellow-300 font-medium">
+          <div className="backdrop-blur-lg bg-white/10 border border-yellow-300/30 shadow-[0_0_15px_rgba(255,215,0,0.3)] px-6 py-2 rounded-xl text-xs text-white">
             {marketerTier}
           </div>
         </div>
       </div>
 
-      <div className="backdrop-blur-lg bg-white/10 border border-[#FFD700]/20 rounded-2xl py-2 px-6 shadow-xl text-center w-full">
-        <h1 className="text-base font-semibold text-white tracking-wide">لوحة تحكم المسوق</h1>
+      <div className="backdrop-blur-lg bg-white/10 border border-[#FFD700]/20 rounded-2xl py-4 px-8 shadow-xl text-center">
+        <h1 className="text-sm font-semibold text-white tracking-wide">لوحة تحكم المسوق</h1>
+      </div>
+
+      <div className="backdrop-blur-lg bg-white/10 border border-white/20 rounded-2xl py-4 px-8 shadow-md text-center">
+        <h2 className="text-sm font-semibold text-white">فريقي</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -140,7 +143,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-10">
-        <h2 className="text-md font-bold mb-4 text-[#FFD700]">🧑‍🤝‍🧑 فريقك:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TeamCard label="فريق A (الإحالة المباشرة)" members={stats.teamA} />
           <TeamCard label="فريق B (إحالة الإحالة)" members={stats.teamB} />
@@ -159,8 +161,8 @@ export default function DashboardPage() {
 function StatCard({ title, value, children }) {
   return (
     <motion.div whileHover={{ scale: 1.03 }}
-      className="backdrop-blur-xl bg-white/10 border border-white/10 rounded-2xl shadow-lg p-6 transition duration-300 hover:shadow-[0_0_30px_#FFD70022]">
-      <div className="text-sm text-white/80 mb-1 font-medium">{title}</div>
+      className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-2xl shadow-lg p-6 transition duration-300 hover:shadow-[0_0_30px_#FFD70022]">
+      <div className="text-sm text-white mb-1 font-medium">{title}</div>
       {value ? <div className="text-2xl font-bold text-white">{value}</div> : children}
     </motion.div>
   );
@@ -170,7 +172,7 @@ function TeamCard({ label, members }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }}
       className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-2xl p-6">
-      <div className="text-[#FFD700] font-semibold mb-2">{label}</div>
+      <div className="text-white font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
         <ul className="list-disc list-inside text-white space-y-1">
           {members.map((m, i) => (
