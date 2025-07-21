@@ -82,17 +82,19 @@ export default function DashboardPage() {
       className="p-8 space-y-8 min-h-screen bg-[#1A1A1A] text-white font-sans">
 
       <div className="flex items-center justify-between">
-        <Image src="/logo.png" alt="PISPC Logo" width={80} height={80} />
-        <div className="relative overflow-hidden rounded-xl px-4 py-2 text-sm shadow-md border border-white/10 backdrop-blur-md bg-white/10">
+        <div className="relative w-[120px] h-[120px]">
+          <div className="absolute inset-0 rounded-full blur-2xl bg-gradient-to-br from-[#fff8e1] via-[#f9e6b1] to-transparent opacity-60 animate-pulse"></div>
+          <Image src="/logo.png" alt="PISPC Logo" width={120} height={120} className="relative z-10 drop-shadow-[0_0_12px_rgba(255,248,225,0.4)]" />
+        </div>
+
+        <div className="bg-[#2B2B2B] rounded-xl px-4 py-2 text-sm shadow-md border border-[#3A3A3A]">
           <div className="text-[#CCCCCC]">{marketerName}</div>
           <div className="text-[#B8860B] font-bold">{marketerTier}</div>
         </div>
       </div>
 
-      <motion.div whileHover={{ scale: 1.01 }}
-        className="relative overflow-hidden backdrop-blur-lg bg-white/10 ring-1 ring-white/10 rounded-2xl p-6 text-xl font-bold text-white border border-white/10">
-        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-white/5 via-white/10 to-transparent opacity-10 pointer-events-none"></div>
-        📊 لوحة تحكم المسوق
+      <motion.div className="bg-[#2B2B2B]/30 backdrop-blur-xl border border-[#444]/30 rounded-2xl p-6 shadow-xl">
+        <h1 className="text-xl font-bold text-[#f5f5dc] text-center">📊 لوحة تحكم المسوق</h1>
       </motion.div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -106,12 +108,11 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div whileHover={{ scale: 1.02 }}
-          className="relative overflow-hidden backdrop-blur-lg bg-white/10 rounded-2xl p-4 border border-white/10 ring-1 ring-white/10 hover:shadow-[0_0_20px_#B8860B33] transition-all">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-white/10 to-transparent opacity-20 pointer-events-none"></div>
+          className="bg-[#2B2B2B] rounded-2xl p-4 border border-[#B8860B]/30 hover:shadow-[0_0_20px_#B8860B33] transition-all">
           <h2 className="text-md font-bold text-[#CC5500] mb-4">📊 توزيع العمولات</h2>
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60}>
+              <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} fill="#8884d8">
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                 ))}
@@ -121,8 +122,7 @@ export default function DashboardPage() {
         </motion.div>
 
         <motion.div whileHover={{ scale: 1.02 }}
-          className="relative overflow-hidden backdrop-blur-lg bg-white/10 rounded-2xl p-4 border border-white/10 ring-1 ring-white/10 hover:shadow-[0_0_20px_#CC550033] transition-all">
-          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-white/10 to-transparent opacity-20 pointer-events-none"></div>
+          className="bg-[#2B2B2B] rounded-2xl p-4 border border-[#CC5500]/30 hover:shadow-[0_0_20px_#CC550033] transition-all">
           <h2 className="text-md font-bold text-[#B8860B] mb-4">📈 عدد العمولات</h2>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
@@ -155,8 +155,7 @@ export default function DashboardPage() {
 function StatCard({ title, value }) {
   return (
     <motion.div whileHover={{ scale: 1.03 }}
-      className="relative overflow-hidden backdrop-blur-lg bg-white/10 ring-1 ring-white/10 border border-white/10 rounded-2xl shadow-md p-6 transition duration-300 hover:shadow-[0_0_30px_#CC550033]">
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-white/5 via-white/10 to-transparent opacity-10 pointer-events-none"></div>
+      className="bg-[#2B2B2B]/30 backdrop-blur-lg border border-[#3A3A3A]/30 rounded-2xl shadow-md p-6 transition duration-300 hover:shadow-[0_0_30px_#CC550033]">
       <div className="text-sm text-[#CCCCCC] mb-1">{title}</div>
       <div className="text-2xl font-bold text-white">{value}</div>
     </motion.div>
@@ -166,8 +165,7 @@ function StatCard({ title, value }) {
 function TeamCard({ label, members }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }}
-      className="relative overflow-hidden backdrop-blur-lg bg-white/10 border border-white/10 ring-1 ring-white/10 rounded-2xl p-6">
-      <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-tr from-white/5 via-white/10 to-transparent opacity-10 pointer-events-none"></div>
+      className="bg-[#2B2B2B]/30 backdrop-blur-lg border border-[#3A3A3A]/30 rounded-2xl p-6">
       <div className="text-[#B8860B] font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
         <ul className="list-disc list-inside text-white space-y-1">
