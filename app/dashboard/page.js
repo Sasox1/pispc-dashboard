@@ -1,12 +1,9 @@
 'use client';
 
-import { useEffect, useState, Suspense, useRef } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Lightformer } from '@react-three/drei';
-import * as THREE from 'three';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -66,17 +63,10 @@ export default function DashboardPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
-      {/* خلفية ثلاثية الأبعاد زجاجية */}
-      <div className="absolute inset-0 -z-10">
-        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
-          <Suspense fallback={null}>
-            <Lights />
-            <GlassBackdrop />
-          </Suspense>
-        </Canvas>
-      </div>
+      {/* خلفية رمادية ثابتة */}
+      <div className="absolute inset-0 -z-10 bg-[#2F2F2F]" />
 
-      {/* المحتوى فوق الخلفية */}
+      {/* المحتوى */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
         <div className="flex items-center justify-between">
           <Image src="/logo.png" alt="PISPC Logo" width={180} height={180} />
@@ -158,48 +148,5 @@ function TeamCard({ label, members }) {
         <ul className="list-disc list-inside space-y-1">{members.map((m, i) => <li key={i}>{m}</li>)}</ul>
       ) : <p className="text-gray-500 italic">لا يوجد أعضاء</p>}
     </motion.div>
-  );
-}
-
-function GlassBackdrop() {
-  return (
-    <mesh scale={[40, 25, 0.5]}>
-      <dodecahedronGeometry args={[3, 1]} />
-      <meshPhysicalMaterial
-        transmission={0.6}
-        roughness={0.9}
-        thickness={3}
-        clearcoat={1}
-        reflectivity={1}
-        metalness={0.25}
-        envMapIntensity={2}
-        color="#cce6ff"
-      />
-    </mesh>
-  );
-}
-
-function Lights() {
-  const groupRef = useRef();
-  const spheres = new Array(5).fill().map((_, i) => useRef());
-
-  useFrame((state, delta) => {
-    spheres.forEach((ref, i) => {
-      if (ref.current) {
-        ref.current.position.x = Math.sin(state.clock.elapsedTime * 0.3 + i) * 10;
-        ref.current.position.y = Math.cos(state.clock.elapsedTime * 0.4 + i) * 5;
-      }
-    });
-  });
-
-  return (
-    <group ref={groupRef}>
-      {spheres.map((ref, i) => (
-        <mesh ref={ref} key={i}>
-          <sphereGeometry args={[1.5, 32, 32]} />
-          <meshBasicMaterial color="#ffe599" transparent opacity={0.25} />
-        </mesh>
-      ))}
-    </group>
   );
 }
