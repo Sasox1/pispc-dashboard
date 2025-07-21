@@ -1,12 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-
-import FOG from 'vanta/dist/vanta.fog.min';
-import * as THREE from 'three';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -14,34 +11,6 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [marketerName, setMarketerName] = useState('');
   const [marketerTier, setMarketerTier] = useState('');
-
-  const vantaRef = useRef(null);
-  const vantaEffect = useRef(null);
-
-  useEffect(() => {
-    if (!vantaEffect.current && vantaRef.current) {
-      vantaEffect.current = FOG({
-        el: vantaRef.current,
-        THREE,
-        mouseControls: false,
-        touchControls: false,
-        gyroControls: false,
-        minHeight: 200.00,
-        minWidth: 200.00,
-        highlightColor: 0xfff8dc,
-        midtoneColor: 0x2d2d2d,
-        lowlightColor: 0x111111,
-        baseColor: 0x1a1a1a,
-        blurFactor: 0.5,
-        speed: 0.3,
-        zoom: 0.9
-      });
-    }
-
-    return () => {
-      if (vantaEffect.current) vantaEffect.current.destroy();
-    };
-  }, []);
 
   useEffect(() => {
     const marketerId = sessionStorage.getItem('marketerId');
@@ -64,6 +33,7 @@ export default function DashboardPage() {
         return res.json();
       })
       .then((data) => {
+        console.log('✅ البيانات المستلمة من السيرفر:', data);
         if (!data.stats) {
           setError('❌ لم يتم استلام بيانات صالحة من السيرفر.');
           return;
@@ -74,6 +44,7 @@ export default function DashboardPage() {
         setMarketerTier(data.stats.marketerTier || '');
       })
       .catch((err) => {
+        console.error('❌ خطأ أثناء التحميل:', err);
         setError('❌ فشل في تحميل البيانات من السيرفر');
       });
   }, []);
@@ -105,32 +76,34 @@ export default function DashboardPage() {
   ];
 
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
+  const textColor = 'text-[#E0E0E0]';
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
-      className="relative p-8 space-y-8 min-h-screen text-white font-sans overflow-hidden">
+      className="relative p-8 space-y-8 min-h-screen bg-[#1A1A1A] text-[#E0E0E0] font-sans overflow-hidden">
 
-      {/* خلفية Vanta FOG */}
-      <div ref={vantaRef} className="absolute top-0 left-0 w-full h-full z-0" />
+      {/* خلفية ضوئية ممتدة */}
+      <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
+        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-r from-white/40 via-yellow-100/20 to-transparent blur-3xl opacity-50" />
+      </div>
 
-      {/* باقي الصفحة */}
       <div className="relative z-10 flex items-center justify-between">
         <div className="relative">
-          <Image src="/logo.png" alt="PISPC Logo" width={280} height={280} />
+          <Image src="/logo.png" alt="PISPC Logo" width={260} height={260} />
           <div className="absolute top-0 left-0 w-full h-full rounded-full bg-white/30 blur-2xl opacity-70" />
         </div>
         <div className="flex flex-col gap-2">
-          <div className="backdrop-blur-lg bg-white/10 border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.3)] px-6 py-3 rounded-xl text-sm text-gray-200 font-bold">
-            {marketerName}
+          <div className="backdrop-blur-lg bg-white/10 border border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.3)] px-6 py-3 rounded-xl text-sm">
+            <div className="text-[#E0E0E0] font-bold">{marketerName}</div>
           </div>
-          <div className="backdrop-blur-lg bg-white/10 border border-yellow-300/30 shadow-[0_0_15px_rgba(255,215,0,0.3)] px-6 py-2 rounded-xl text-xs text-gray-200 font-medium">
+          <div className="backdrop-blur-lg bg-white/10 border border-yellow-300/30 shadow-[0_0_15px_rgba(255,215,0,0.3)] px-6 py-2 rounded-xl text-xs text-yellow-300 font-medium">
             {marketerTier}
           </div>
         </div>
       </div>
 
       <div className="backdrop-blur-lg bg-white/10 border border-[#FFD700]/20 rounded-2xl py-4 px-8 shadow-xl text-center">
-        <h1 className="text-lg font-semibold text-gray-200 tracking-wide">لوحة تحكم المسوق</h1>
+        <h1 className="text-lg font-semibold text-[#E0E0E0] tracking-wide">لوحة تحكم المسوق</h1>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -167,17 +140,18 @@ export default function DashboardPage() {
         </StatCard>
       </div>
 
-      {/* عنوان فريقك */}
-      <div className="backdrop-blur-lg bg-white/10 border border-[#FFD700]/20 rounded-2xl py-3 px-6 shadow-md text-center">
-        <h2 className="text-base font-semibold text-gray-200">فريقي</h2>
+      <div className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-2xl py-3 px-6 text-center">
+        <h2 className="text-md font-semibold text-[#E0E0E0] tracking-wide">فريقي</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <TeamCard label="فريق A (الإحالة المباشرة)" members={stats.teamA} />
-        <TeamCard label="فريق B (إحالة الإحالة)" members={stats.teamB} />
+      <div className="mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <TeamCard label="فريق A (الإحالة المباشرة)" members={stats.teamA} />
+          <TeamCard label="فريق B (إحالة الإحالة)" members={stats.teamB} />
+        </div>
       </div>
 
-      <div className="mt-10 bg-[#1E1E1E]/80 p-4 rounded-xl text-xs text-gray-400 whitespace-pre-wrap border border-gray-700">
+      <div className="mt-10 bg-[#1E1E1E] p-4 rounded-xl text-xs text-[#E0E0E0] whitespace-pre-wrap border border-gray-700">
         🛠️ <strong>معلومات تصحيحية (Debug Info):</strong>
         {'\n'}
         {debug}
@@ -190,8 +164,8 @@ function StatCard({ title, value, children }) {
   return (
     <motion.div whileHover={{ scale: 1.03 }}
       className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-2xl shadow-lg p-6 transition duration-300 hover:shadow-[0_0_30px_#FFD70022]">
-      <div className="text-sm text-gray-200 mb-1 font-medium">{title}</div>
-      {value ? <div className="text-2xl font-bold text-gray-100">{value}</div> : children}
+      <div className="text-sm text-[#E0E0E0] mb-1 font-medium">{title}</div>
+      {value ? <div className="text-2xl font-bold text-[#E0E0E0]">{value}</div> : children}
     </motion.div>
   );
 }
@@ -200,9 +174,9 @@ function TeamCard({ label, members }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }}
       className="backdrop-blur-lg bg-white/10 border border-white/10 rounded-2xl p-6">
-      <div className="text-gray-200 font-semibold mb-2">{label}</div>
+      <div className="text-[#E0E0E0] font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
-        <ul className="list-disc list-inside text-gray-100 space-y-1">
+        <ul className="list-disc list-inside text-[#E0E0E0] space-y-1">
           {members.map((m, i) => (
             <li key={i}>{m}</li>
           ))}
