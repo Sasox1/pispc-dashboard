@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Lightformer, Sphere, Float } from '@react-three/drei';
+import { Environment, Float, Sphere, MeshDistortMaterial } from '@react-three/drei';
 import * as THREE from 'three';
 
 export default function DashboardPage() {
@@ -66,22 +66,15 @@ export default function DashboardPage() {
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
-      {/* خلفية ثلاثية الأبعاد زجاجية */}
       <div className="absolute inset-0 -z-10">
-        <Canvas camera={{ position: [0, 0, 8], fov: 45 }}>
-          <ambientLight intensity={0.5} />
-          <pointLight position={[10, 10, 10]} intensity={2} />
+        <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
           <Suspense fallback={null}>
-            <Environment resolution={128}>
-              <Lightformer intensity={1.5} position={[0, 5, -10]} scale={[10, 10]} />
-            </Environment>
+            <MovingLights count={5} />
             <GlassPanel />
-            <MovingLights />
           </Suspense>
         </Canvas>
       </div>
 
-      {/* المحتوى فوق الخلفية */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
         <div className="flex items-center justify-between">
           <Image src="/logo.png" alt="PISPC Logo" width={180} height={180} />
@@ -168,7 +161,6 @@ function TeamCard({ label, members }) {
 
 function GlassPanel() {
   const meshRef = useRef();
-
   useFrame((state, delta) => {
     if (meshRef.current) {
       meshRef.current.rotation.y += delta * 0.05;
@@ -176,30 +168,37 @@ function GlassPanel() {
   });
 
   return (
-    <mesh ref={meshRef} scale={[12, 12, 1]} position={[0, 0, -1]}>
-      <icosahedronGeometry args={[1.4, 6]} />
+    <mesh ref={meshRef} scale={[15, 10, 1]} position={[0, 0, -1]}>
+      <icosahedronGeometry args={[1.5, 5]} />
       <meshPhysicalMaterial
-        transmission={1}
+        transmission={0.3}
         roughness={0.9}
         thickness={5}
+        ior={2.4}
         clearcoat={1}
-        metalness={0.2}
-        reflectivity={0.7}
-        envMapIntensity={2}
-        color="#ffffff"
-        ior={2.5}
+        metalness={0.1}
+        reflectivity={0.5}
+        color="#aeeaff"
       />
     </mesh>
   );
 }
 
-function MovingLights() {
-  const balls = new Array(10).fill(0);
-  return balls.map((_, i) => (
-    <Float key={i} speed={0.4} rotationIntensity={1} floatIntensity={2}>
-      <Sphere args={[0.1, 16, 16]} position={[Math.random() * 6 - 3, Math.random() * 6 - 3, Math.random() * -5 - 1]}>
-        <meshStandardMaterial emissive="#ffeeaa" emissiveIntensity={2} color="#000000" transparent opacity={0.5} />
+function MovingLights({ count = 5 }) {
+  const lights = new Array(count).fill().map((_, i) => (
+    <Float key={i} speed={0.2} rotationIntensity={0.5} floatIntensity={0.5}>
+      <Sphere args={[1.8, 32, 32]}>
+        <MeshDistortMaterial
+          color="#ffffcc"
+          emissive="#ffffcc"
+          emissiveIntensity={2}
+          speed={1}
+          roughness={0.4}
+          transparent
+          opacity={0.15}
+        />
       </Sphere>
     </Float>
   ));
+  return <group>{lights}</group>;
 }
