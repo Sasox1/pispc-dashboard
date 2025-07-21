@@ -1,18 +1,9 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis
-} from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -58,14 +49,6 @@ export default function DashboardPage() {
       });
   }, []);
 
-  const chartData = [
-    { name: 'مباشر', value: stats?.totalDirectCommission || 0 },
-    { name: 'إحالة', value: stats?.totalReferralCommission || 0 },
-    { name: 'إحالة الإحالة', value: stats?.totalRofRCommission || 0 }
-  ];
-
-  const COLORS = ['#00f7ff', '#a855f7', '#10b981'];
-
   if (error) {
     return (
       <div className="p-8 text-red-600 font-bold whitespace-pre-wrap">
@@ -78,7 +61,7 @@ export default function DashboardPage() {
 
   if (!stats) {
     return (
-      <div className="p-8 text-gray-400 animate-pulse whitespace-pre-wrap">
+      <div className="p-8 text-gray-500 animate-pulse whitespace-pre-wrap">
         ⏳ جاري تحميل البيانات...
         {'\n\n'}
         {debug}
@@ -86,77 +69,77 @@ export default function DashboardPage() {
     );
   }
 
+  const chartData = [
+    { name: 'مباشر', value: stats.totalDirectCommission },
+    { name: 'إحالة', value: stats.totalReferralCommission },
+    { name: 'إحالة الإحالة', value: stats.totalRofRCommission },
+  ];
+
+  const colors = ['#08FDD8', '#00C2FF', '#7B61FF'];
+
   return (
-    <motion.div
-      className="p-8 space-y-6 min-h-screen text-white bg-gradient-to-br from-gray-950 via-gray-900 to-gray-950"
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.7 }}
-    >
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
+      className="p-8 space-y-8 min-h-screen bg-[#0F111A] text-white font-mono">
+
       <div className="flex items-center justify-between">
-        <Image src="/logo.png" width={120} height={48} alt="PISPC Logo" />
+        <Image src="/logo.png" alt="PISPC Logo" width={80} height={80} />
         <div className="text-right">
-          <div className="text-sm">اسم المسوق: <span className="text-emerald-400 font-bold">{marketerName}</span></div>
-          <div className="text-sm">الطبقة الحالية: <span className="text-cyan-400 font-bold">{marketerTier}</span></div>
+          <div className="text-sm text-gray-400">اسم المسوق:
+            <span className="text-white font-bold ml-1">{marketerName}</span></div>
+          <div className="text-sm text-gray-400">الطبقة:
+            <span className="text-white font-bold ml-1">{marketerTier}</span></div>
         </div>
       </div>
 
-      <h1 className="text-xl font-bold text-sky-300 border-b border-sky-700 pb-2">📊 لوحة تحكم المسوق</h1>
+      <h1 className="text-xl font-bold text-[#08FDD8] border-b border-gray-700 pb-2">
+        📊 لوحة تحكم المسوق
+      </h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="العمولة المباشرة" value={stats.totalDirectCommission + ' SP'} icon="💼" />
-        <StatCard title="عمولة الإحالة" value={stats.totalReferralCommission + ' SP'} icon="👥" />
-        <StatCard title="عمولة إحالة الإحالة" value={stats.totalRofRCommission + ' SP'} icon="📡" />
-        <StatCard title="العمولات المدفوعة" value={stats.totalPaid} icon="✅" />
-        <StatCard title="العمولات غير المدفوعة" value={stats.totalPending} icon="⏳" />
-        <StatCard title="عدد ترقياتك" value={stats.upgradeHistory.length} icon="🚀" />
+        <StatCard title="العمولة المباشرة" value={stats.totalDirectCommission + ' SP'} />
+        <StatCard title="عمولة الإحالة" value={stats.totalReferralCommission + ' SP'} />
+        <StatCard title="عمولة إحالة الإحالة" value={stats.totalRofRCommission + ' SP'} />
+        <StatCard title="العمولات المدفوعة" value={stats.totalPaid} />
+        <StatCard title="العمولات غير المدفوعة" value={stats.totalPending} />
+        <StatCard title="عدد ترقياتك" value={stats.upgradeHistory.length} />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-cyan-800">
-          <h2 className="text-cyan-400 font-semibold mb-4">🎯 توزيع العمولات (دائري)</h2>
-          <ResponsiveContainer width="100%" height={240}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <motion.div whileHover={{ scale: 1.02 }} className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-[#08FDD8]/30">
+          <h2 className="text-md font-bold text-[#7B61FF] mb-4">📊 توزيع العمولات</h2>
+          <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie
-                data={chartData}
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-                label
-              >
+              <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} fill="#8884d8">
                 {chartData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                 ))}
               </Pie>
-              <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
 
-        <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-purple-800">
-          <h2 className="text-purple-300 font-semibold mb-4">📊 رسم بياني عمودي</h2>
-          <ResponsiveContainer width="100%" height={240}>
+        <motion.div whileHover={{ scale: 1.02 }} className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-[#08FDD8]/30">
+          <h2 className="text-md font-bold text-[#7B61FF] mb-4">📈 عدد العمولات</h2>
+          <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
               <XAxis dataKey="name" stroke="#ccc" />
               <YAxis stroke="#ccc" />
               <Tooltip />
-              <Bar dataKey="value" fill="#00f7ff" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="value" fill="#08FDD8" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </div>
+        </motion.div>
       </div>
 
       <div className="mt-10">
-        <h2 className="text-lg font-bold mb-4 text-pink-400">🧑‍🤝‍🧑 فريقك:</h2>
+        <h2 className="text-md font-bold mb-4 text-[#00C2FF]">🧑‍🤝‍🧑 فريقك:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TeamCard label="فريق A (الإحالة المباشرة)" members={stats.teamA} />
           <TeamCard label="فريق B (إحالة الإحالة)" members={stats.teamB} />
         </div>
       </div>
 
-      <div className="mt-10 bg-white/10 backdrop-blur-md p-4 rounded-xl text-xs text-gray-300 whitespace-pre-wrap border border-gray-700">
+      <div className="mt-10 bg-white/5 backdrop-blur-md p-4 rounded-xl text-xs text-gray-400 whitespace-pre-wrap border border-gray-700">
         🛠️ <strong>معلومات تصحيحية (Debug Info):</strong>
         {'\n'}
         {debug}
@@ -165,17 +148,11 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, icon }) {
+function StatCard({ title, value }) {
   return (
-    <motion.div
-      className="bg-white/10 backdrop-blur-md border border-cyan-700 rounded-2xl shadow-xl p-6 hover:scale-[1.03] transition-all duration-300"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-    >
-      <div className="text-sm text-cyan-300 mb-1 flex items-center gap-2">
-        <span className="text-lg">{icon}</span> {title}
-      </div>
+    <motion.div whileHover={{ scale: 1.03 }}
+      className="bg-white/10 backdrop-blur-md border border-[#7B61FF]/20 rounded-2xl shadow-lg p-6 transition duration-300 hover:shadow-[0_0_30px_#08FDD8]/10">
+      <div className="text-sm text-gray-400 mb-1">{title}</div>
       <div className="text-2xl font-bold text-white">{value}</div>
     </motion.div>
   );
@@ -183,8 +160,9 @@ function StatCard({ title, value, icon }) {
 
 function TeamCard({ label, members }) {
   return (
-    <motion.div className="bg-white/10 backdrop-blur-md border border-blue-700 rounded-2xl shadow p-6">
-      <div className="text-blue-300 font-semibold mb-2">{label}</div>
+    <motion.div whileHover={{ scale: 1.02 }}
+      className="bg-white/10 backdrop-blur-md border border-[#00C2FF]/20 rounded-2xl p-6">
+      <div className="text-[#00C2FF] font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
         <ul className="list-disc list-inside text-white space-y-1">
           {members.map((m, i) => (
@@ -192,7 +170,7 @@ function TeamCard({ label, members }) {
           ))}
         </ul>
       ) : (
-        <p className="text-gray-400 italic">لا يوجد أعضاء</p>
+        <p className="text-gray-500 italic">لا يوجد أعضاء</p>
       )}
     </motion.div>
   );
