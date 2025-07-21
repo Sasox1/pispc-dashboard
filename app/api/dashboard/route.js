@@ -31,11 +31,12 @@ export async function POST(req) {
 
     console.log('📩 Received marketerId:', marketerId);
 
-    const [commissions, users, pyramid, upgrades] = await Promise.all([
+    const [commissions, users, pyramid, upgrades, marketers] = await Promise.all([
       getSheetData('توزيع العمولات'),   // العمود A = ID
       getSheetData('المستخدمين'),       // العمود C = ID
       getSheetData('الهرم'),             // العمود A = ID
       getSheetData('سجل الترقية'),       // العمود B = ID
+      getSheetData('صالة المسوقين'),     // العمود A = ID، B = الاسم، G = الطبقة
     ]);
 
     const cleanedCommissions = commissions.filter(row => row[0] && row[0] !== 'ID');
@@ -53,6 +54,10 @@ export async function POST(req) {
     const teamA = pyramidRow?.[2]?.split(',').map(e => e.trim()).filter(Boolean) || [];
     const teamB = pyramidRow?.[3]?.split(',').map(e => e.trim()).filter(Boolean) || [];
 
+    const marketerRow = marketers.find(row => row[0] === marketerId);
+    const marketerName = marketerRow?.[1] || 'غير معروف';
+    const marketerLevel = marketerRow?.[6] || 'غير محددة';
+
     const response = {
       stats: {
         totalDirectCommission: directSales.length,
@@ -63,6 +68,8 @@ export async function POST(req) {
         upgradeHistory: upgradeRecords,
         teamA,
         teamB,
+        marketerName,
+        marketerLevel,
       }
     };
 
