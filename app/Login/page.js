@@ -29,6 +29,7 @@ export default function LoginPage() {
 
       // 🔐 تخزين المعرف في sessionStorage
       sessionStorage.setItem('marketerId', marketerId);
+      console.log('✅ تم تخزين معرف المسوق:', marketerId); // Debug فقط
 
       // 🚀 الانتقال إلى لوحة التحكم
       router.push('/dashboard');
