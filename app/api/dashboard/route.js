@@ -24,6 +24,11 @@ async function getSheetData(sheetName) {
   return res.data.values;
 }
 
+function getCurrentMonth() {
+  const now = new Date();
+  return `${now.getFullYear()}/${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
 export async function POST(req) {
   try {
     const body = await req.json();
@@ -31,12 +36,13 @@ export async function POST(req) {
 
     console.log('📩 Received marketerId:', marketerId);
 
-    const [commissions, users, pyramid, upgrades, marketers] = await Promise.all([
-      getSheetData('توزيع العمولات'),   // العمود A = ID
-      getSheetData('المستخدمين'),       // العمود C = ID
-      getSheetData('الهرم'),             // العمود A = ID
-      getSheetData('سجل الترقية'),       // العمود B = ID
-      getSheetData('صالة المسوقين'),     // العمود A = ID، B = الاسم، G = الطبقة
+    const [commissions, users, pyramid, upgrades, marketers, rabat] = await Promise.all([
+      getSheetData('توزيع العمولات'),
+      getSheetData('المستخدمين'),
+      getSheetData('الهرم'),
+      getSheetData('سجل الترقية'),
+      getSheetData('صالة المسوقين'),
+      getSheetData('رباط'), // ✅ جديد
     ]);
 
     const cleanedCommissions = commissions.filter(row => row[0] && row[0] !== 'ID');
@@ -48,9 +54,9 @@ export async function POST(req) {
     const totalPaid = cleanedCommissions.filter(row => row[0] === marketerId && row[11] === '✓').length;
     const totalPending = cleanedCommissions.filter(row => row[0] === marketerId && row[11] !== '✓').length;
 
-    const upgradeRecords = upgrades.filter(row => row[1] === marketerId); // سجل الترقية - العمود B
+    const upgradeRecords = upgrades.filter(row => row[1] === marketerId);
 
-    const pyramidRow = pyramid.find(row => row[0] === marketerId); // الهرم - العمود A
+    const pyramidRow = pyramid.find(row => row[0] === marketerId);
     const teamA = pyramidRow?.[2]?.split(',').map(e => e.trim()).filter(Boolean) || [];
     const teamB = pyramidRow?.[3]?.split(',').map(e => e.trim()).filter(Boolean) || [];
 
@@ -58,11 +64,45 @@ export async function POST(req) {
     const marketerName = marketerRow?.[1] || 'غير معروف';
     const marketerLevel = marketerRow?.[6] || 'غير محددة';
 
+    // ✅ حساب العمولات من ورقة "رباط"
+    const currentMonth = getCurrentMonth();
+
+    let totalMonthEarnings = 0;
+    let directCommission = 0;
+    let teamACommission = 0;
+    let teamBCommission = 0;
+
+    for (let row of rabat) {
+      if (!row[0] || row[0] === 'رقم المسوق') continue;
+      if (row[0] !== marketerId) continue;
+
+      const monthCols = [
+        { month: row[1], check: row[2] },
+        { month: row[3], check: row[4] },
+        { month: row[5], check: row[6] },
+        { month: row[7], check: row[8] },
+        { month: row[9], check: row[10] },
+      ];
+
+      for (let { month, check } of monthCols) {
+        if (month === currentMonth && check === '✓') {
+          const type = row[16]?.trim(); // العمود Q - نوع البيع
+          const commission = parseInt(row[17]?.replace(/[^0-9]/g, '') || '0'); // العمود R - عمولة
+
+          totalMonthEarnings += commission;
+
+          if (type === 'بيع مباشر') directCommission += commission;
+          else if (type === 'احالة') teamACommission += commission;
+          else if (type === 'احالة احالة') teamBCommission += commission;
+        }
+      }
+    }
+
     const response = {
       stats: {
-        totalDirectCommission: directSales.length,
-        totalReferralCommission: referralSales.length,
-        totalRofRCommission: referralOfReferralSales.length,
+        totalDirectCommission: directCommission,
+        totalReferralCommission: teamACommission,
+        totalRofRCommission: teamBCommission,
         totalPaid,
         totalPending,
         upgradeHistory: upgradeRecords,
@@ -70,6 +110,7 @@ export async function POST(req) {
         teamB,
         marketerName,
         marketerLevel,
+        currentMonthEarnings: totalMonthEarnings,
       }
     };
 
