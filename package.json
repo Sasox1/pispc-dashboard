@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-three/drei": "^10.5.1",
     "@react-three/fiber": "^9.2.0",
+    "@react-three/postprocessing": "^3.0.4",
     "apexcharts": "^5.2.0",
     "framer-motion": "^12.23.6",
     "googleapis": "^153.0.0",
