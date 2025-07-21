@@ -79,23 +79,27 @@ export default function DashboardPage() {
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}
-      className="p-8 space-y-8 min-h-screen bg-[#1A1A1A] text-white font-sans">
+      className="relative p-8 space-y-8 min-h-screen bg-[#1A1A1A] text-white font-sans overflow-hidden">
 
-      <div className="flex items-center justify-between">
-        <div className="relative w-[120px] h-[120px]">
-          <div className="absolute inset-0 rounded-full blur-2xl bg-gradient-to-br from-[#fff8e1] via-[#f9e6b1] to-transparent opacity-60 animate-pulse"></div>
-          <Image src="/logo.png" alt="PISPC Logo" width={120} height={120} className="relative z-10 drop-shadow-[0_0_12px_rgba(255,248,225,0.4)]" />
+      {/* خلفية ضوئية ممتدة */}
+      <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
+        <div className="absolute top-10 left-10 w-[600px] h-[600px] bg-gradient-to-br from-white/20 to-yellow-100/10 rounded-full blur-3xl opacity-30 animate-pulse" style={{ transform: 'rotate(20deg)' }} />
+      </div>
+
+      <div className="relative z-10 flex items-center justify-between">
+        <div className="relative">
+          <Image src="/logo.png" alt="PISPC Logo" width={120} height={120} />
+          <div className="absolute top-0 left-0 w-full h-full rounded-full bg-white/20 blur-2xl opacity-40" />
         </div>
-
-        <div className="bg-[#2B2B2B] rounded-xl px-4 py-2 text-sm shadow-md border border-[#3A3A3A]">
-          <div className="text-[#CCCCCC]">{marketerName}</div>
-          <div className="text-[#B8860B] font-bold">{marketerTier}</div>
+        <div className="backdrop-blur-md bg-white/10 border border-white/10 shadow-[0_0_20px_rgba(255,255,255,0.2)] px-6 py-3 rounded-xl text-sm">
+          <div className="text-white font-bold">{marketerName}</div>
+          <div className="text-[#FFD700]">{marketerTier}</div>
         </div>
       </div>
 
-      <motion.div className="bg-[#2B2B2B]/30 backdrop-blur-xl border border-[#444]/30 rounded-2xl p-6 shadow-xl">
-        <h1 className="text-xl font-bold text-[#f5f5dc] text-center">📊 لوحة تحكم المسوق</h1>
-      </motion.div>
+      <div className="backdrop-blur-md bg-white/10 border border-[#FFD700]/20 rounded-2xl p-6 shadow-lg">
+        <h1 className="text-2xl font-bold text-white tracking-wide">📊 لوحة تحكم المسوق</h1>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StatCard title="العمولة المباشرة" value={stats.totalDirectCommission + ' SP'} />
@@ -107,23 +111,19 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <motion.div whileHover={{ scale: 1.02 }}
-          className="bg-[#2B2B2B] rounded-2xl p-4 border border-[#B8860B]/30 hover:shadow-[0_0_20px_#B8860B33] transition-all">
-          <h2 className="text-md font-bold text-[#CC5500] mb-4">📊 توزيع العمولات</h2>
+        <StatCard title="📊 توزيع العمولات">
           <ResponsiveContainer width="100%" height={200}>
             <PieChart>
-              <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60} fill="#8884d8">
+              <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60}>
                 {chartData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
                 ))}
               </Pie>
             </PieChart>
           </ResponsiveContainer>
-        </motion.div>
+        </StatCard>
 
-        <motion.div whileHover={{ scale: 1.02 }}
-          className="bg-[#2B2B2B] rounded-2xl p-4 border border-[#CC5500]/30 hover:shadow-[0_0_20px_#CC550033] transition-all">
-          <h2 className="text-md font-bold text-[#B8860B] mb-4">📈 عدد العمولات</h2>
+        <StatCard title="📈 عدد العمولات">
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={chartData}>
               <XAxis dataKey="name" stroke="#ccc" />
@@ -132,11 +132,11 @@ export default function DashboardPage() {
               <Bar dataKey="value" fill="#CC5500" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
-        </motion.div>
+        </StatCard>
       </div>
 
       <div className="mt-10">
-        <h2 className="text-md font-bold mb-4 text-[#B8860B]">🧑‍🤝‍🧑 فريقك:</h2>
+        <h2 className="text-md font-bold mb-4 text-[#FFD700]">🧑‍🤝‍🧑 فريقك:</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TeamCard label="فريق A (الإحالة المباشرة)" members={stats.teamA} />
           <TeamCard label="فريق B (إحالة الإحالة)" members={stats.teamB} />
@@ -152,12 +152,12 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value }) {
+function StatCard({ title, value, children }) {
   return (
     <motion.div whileHover={{ scale: 1.03 }}
-      className="bg-[#2B2B2B]/30 backdrop-blur-lg border border-[#3A3A3A]/30 rounded-2xl shadow-md p-6 transition duration-300 hover:shadow-[0_0_30px_#CC550033]">
-      <div className="text-sm text-[#CCCCCC] mb-1">{title}</div>
-      <div className="text-2xl font-bold text-white">{value}</div>
+      className="backdrop-blur-md bg-white/10 border border-white/10 rounded-2xl shadow-lg p-6 transition duration-300 hover:shadow-[0_0_30px_#FFD70022]">
+      <div className="text-sm text-white/80 mb-1 font-medium">{title}</div>
+      {value ? <div className="text-2xl font-bold text-white">{value}</div> : children}
     </motion.div>
   );
 }
@@ -165,8 +165,8 @@ function StatCard({ title, value }) {
 function TeamCard({ label, members }) {
   return (
     <motion.div whileHover={{ scale: 1.02 }}
-      className="bg-[#2B2B2B]/30 backdrop-blur-lg border border-[#3A3A3A]/30 rounded-2xl p-6">
-      <div className="text-[#B8860B] font-semibold mb-2">{label}</div>
+      className="backdrop-blur-md bg-white/10 border border-white/10 rounded-2xl p-6">
+      <div className="text-[#FFD700] font-semibold mb-2">{label}</div>
       {members.length > 0 ? (
         <ul className="list-disc list-inside text-white space-y-1">
           {members.map((m, i) => (
