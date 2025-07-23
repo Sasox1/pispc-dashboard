@@ -175,9 +175,9 @@ export default function DashboardPage() {
                 padding={0.4}
                 colors={({ id, data }) => {
                   const gradientMap = {
-                    'بيع مباشر': '#FBBF24',
-                    'فريق A': '#60A5FA',
-                    'فريق B': '#F472B6',
+                    'بيع مباشر': '#f6db98ff',
+                    'فريق A': '#9cc3f4ff',
+                    'فريق B': '#f4b1d4ff',
                   };
                   return gradientMap[data.name] || '#ddd';
                 }}
