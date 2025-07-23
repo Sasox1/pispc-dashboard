@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
 import GaugeChart from 'react-gauge-chart';
+import 'react-circular-progressbar/dist/styles.css';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -101,35 +102,41 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <StatCard title="🎯 مؤشر الوصول للمكافأة" customSize>
-            <GaugeChart
-              id="bonus-gauge"
-              nrOfLevels={20}
-              percent={(stats.bonusProgress || 0) / 100}
-              arcWidth={0.3}
-              colors={['#FF5F6D', '#FFC371']}
-              textColor="#fff"
-              arcsLength={[0.5, 0.5]}
-              arcPadding={0.02}
-              needleColor="#fff"
-              needleBaseColor="#fff"
-              style={{ width: '100%', height: '120px' }}
-            />
+          <StatCard title="🎯 مؤشر الوصول للمكافأة">
+            <div className="flex justify-center items-center h-32">
+              <GaugeChart
+                id="bonus-gauge"
+                nrOfLevels={20}
+                percent={(stats.bonusProgress || 0) / 100}
+                arcPadding={0.03}
+                cornerRadius={2}
+                textColor="#ffffff"
+                arcsLength={[1]}
+                colors={["#10B981"]}
+                needleColor="#FCD34D"
+                animate={false}
+                arcWidth={0.3}
+                style={{ width: '100%', maxWidth: '200px' }}
+              />
+            </div>
           </StatCard>
-          <StatCard title="🚀 مؤشر الترقية" customSize>
-            <GaugeChart
-              id="upgrade-gauge"
-              nrOfLevels={20}
-              percent={(stats.upgradeProgress || 0) / 100}
-              arcWidth={0.3}
-              colors={['#00C9A7', '#92FE9D']}
-              textColor="#fff"
-              arcsLength={[0.5, 0.5]}
-              arcPadding={0.02}
-              needleColor="#fff"
-              needleBaseColor="#fff"
-              style={{ width: '100%', height: '120px' }}
-            />
+          <StatCard title="🚀 مؤشر الترقية">
+            <div className="flex justify-center items-center h-32">
+              <GaugeChart
+                id="upgrade-gauge"
+                nrOfLevels={20}
+                percent={(stats.upgradeProgress || 0) / 100}
+                arcPadding={0.03}
+                cornerRadius={2}
+                textColor="#ffffff"
+                arcsLength={[1]}
+                colors={["#F59E0B"]}
+                needleColor="#FCD34D"
+                animate={false}
+                arcWidth={0.3}
+                style={{ width: '100%', maxWidth: '200px' }}
+              />
+            </div>
           </StatCard>
         </div>
 
@@ -202,9 +209,9 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, children, customSize = false }) {
+function StatCard({ title, value, children }) {
   return (
-    <motion.div whileHover={{ scale: 1.03 }} className={`bg-white/10 border border-white/10 rounded-2xl shadow-lg p-4 transition hover:shadow-yellow-500/20 text-center ${customSize ? 'h-[160px]' : ''}`}>
+    <motion.div whileHover={{ scale: 1.03 }} className="bg-white/10 border border-white/10 rounded-2xl shadow-lg p-4 transition hover:shadow-yellow-500/20 text-center">
       <div className="text-xs font-medium mb-1">{title}</div>
       {value ? <div className="text-lg font-bold">{value}</div> : children}
     </motion.div>
