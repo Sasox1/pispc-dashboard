@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, Suspense, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { ResponsivePie } from '@nivo/pie';
@@ -100,7 +100,6 @@ export default function DashboardPage() {
           <StatCard title="عدد ترقياتك" value={stats.upgradeHistory.length} />
         </div>
 
-        {/* ✅ الرسوم البيانية الجديدة بـ nivo */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <StatCard title="📊 توزيع العمولات">
             <div style={{ height: 220 }}>
@@ -129,31 +128,26 @@ export default function DashboardPage() {
                 keys={['value']}
                 indexBy="name"
                 margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
-                padding={0.3}
-                colors={{ scheme: 'orange_red' }}
+                padding={0.35}
+                colors={{ scheme: 'nivo' }}
+                borderRadius={3}
                 axisBottom={{
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
-                  legend: '',
-                  legendPosition: 'middle',
-                  legendOffset: 32
                 }}
                 axisLeft={{
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
-                  legend: '',
-                  legendPosition: 'middle',
-                  legendOffset: -40
                 }}
-                labelSkipWidth={12}
+                labelSkipWidth={16}
                 labelSkipHeight={12}
-                labelTextColor="#eee"
-                tooltip={({ id, value }) => (
-                  <strong style={{ color: '#FFD700' }}>
-                    {id}: {value}
-                  </strong>
+                labelTextColor="#fff"
+                tooltip={({ id, value, indexValue }) => (
+                  <div style={{ padding: '6px 10px', background: '#111', color: '#FFD700', borderRadius: '4px' }}>
+                    {indexValue} : {value}
+                  </div>
                 )}
               />
             </div>
