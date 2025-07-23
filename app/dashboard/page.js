@@ -60,10 +60,11 @@ export default function DashboardPage() {
     { id: 'فريق B', label: 'فريق B', value: stats.totalRofRCommission },
   ];
 
-  const barData = chartData.map(entry => ({
-    name: entry.label,
-    value: entry.value,
-  }));
+  const barData = [
+    { name: 'بيع مباشر', value: stats.countDirectCommission },
+    { name: 'فريق A', value: stats.countReferralCommission },
+    { name: 'فريق B', value: stats.countRofRCommission },
+  ];  
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
@@ -128,28 +129,1328 @@ export default function DashboardPage() {
                 keys={['value']}
                 indexBy="name"
                 margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
-                padding={0.35}
-                colors={{ scheme: 'nivo' }}
-                borderRadius={3}
+                padding={0.3}
+                colors={({ id, data }) => {
+                  if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+                  if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+                  if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+                  return '#ccc';
+                }}
                 axisBottom={{
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
+                  legend: '',
+                  legendPosition: 'middle',
+                  legendOffset: 32
                 }}
                 axisLeft={{
                   tickSize: 5,
                   tickPadding: 5,
                   tickRotation: 0,
+                  legend: '',
+                  legendPosition: 'middle',
+                  legendOffset: -40
                 }}
-                labelSkipWidth={16}
+                enableLabel={true}
+                labelSkipWidth={12}
                 labelSkipHeight={12}
-                labelTextColor="#fff"
-                tooltip={({ id, value, indexValue }) => (
-                  <div style={{ padding: '6px 10px', background: '#111', color: '#dbd5b4ff', borderRadius: '4px' }}>
-                    {indexValue} : {value}
+                labelTextColor="#000"
+                tooltip={({ indexValue, value, color }) => (
+                  <div style={{
+                    background: '#1a1a1a',
+                    padding: '8px 12px',
+                    borderRadius: '6px',
+                    color: '#fff',
+                    boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+                  }}>
+                    <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
                   </div>
                 )}
+                theme={{
+                  tooltip: {
+                    container: {
+                      fontSize: '13px',
+                      fontFamily: 'sans-serif',
+                    }
+                  }
+                }}
               />
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                  <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                  <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                  <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                  <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                  <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                  <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                }}
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                  <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                    {indexValue} : {value}
+                  <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+                <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
+              <ResponsiveBar
+  data={barData}
+  keys={['value']}
+  indexBy="name"
+  margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+  padding={0.3}
+  colors={({ id, data }) => {
+    if (data.name === 'بيع مباشر') return '#FFD700';     // ذهبي
+    if (data.name === 'فريق A') return '#00BFFF';          // أزرق فاتح
+    if (data.name === 'فريق B') return '#FF6347';          // برتقالي/أحمر
+    return '#ccc';
+  }}
+  axisBottom={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: 32
+  }}
+  axisLeft={{
+    tickSize: 5,
+    tickPadding: 5,
+    tickRotation: 0,
+    legend: '',
+    legendPosition: 'middle',
+    legendOffset: -40
+  }}
+  enableLabel={true}
+  labelSkipWidth={12}
+  labelSkipHeight={12}
+  labelTextColor="#000"
+  tooltip={({ indexValue, value, color }) => (
+    <div style={{
+      background: '#1a1a1a',
+      padding: '8px 12px',
+      borderRadius: '6px',
+      color: '#fff',
+      boxShadow: '0 0 12px rgba(255,255,255,0.15)'
+    }}>
+      <strong style={{ color }}>{indexValue}:</strong> {value} عمولة
+    </div>
+  )}
+  theme={{
+    tooltip: {
+      container: {
+        fontSize: '13px',
+        fontFamily: 'sans-serif',
+      }
+    }
+  }}
+/>
+
             </div>
           </StatCard>
         </div>
