@@ -36,13 +36,24 @@ export async function POST(req) {
 
     console.log('📩 Received marketerId:', marketerId);
 
-    const [commissions, users, pyramid, upgrades, marketers, rabat] = await Promise.all([
+    const [
+      commissions,
+      users,
+      pyramid,
+      upgrades,
+      marketers,
+      rabat,
+      rewardLink,
+      tierRepo
+    ] = await Promise.all([
       getSheetData('توزيع العمولات'),
       getSheetData('المستخدمين'),
       getSheetData('الهرم'),
       getSheetData('سجل الترقية'),
       getSheetData('صالة المسوقين'),
       getSheetData('رباط'),
+      getSheetData('ربط المكافآت'),
+      getSheetData('مستودع الطبقات'),
     ]);
 
     const cleanedCommissions = commissions.filter(row => row[0] && row[0] !== 'ID');
@@ -64,7 +75,6 @@ export async function POST(req) {
     const marketerName = marketerRow?.[1] || 'غير معروف';
     const marketerLevel = marketerRow?.[6] || 'غير محددة';
 
-    // ✅ حساب العمولات وعددها من ورقة "رباط"
     const currentMonth = getCurrentMonth();
 
     let totalMonthEarnings = 0;
@@ -90,8 +100,8 @@ export async function POST(req) {
 
       for (let { month, check } of monthCols) {
         if (month === currentMonth && check === '✓') {
-          const type = row[16]?.trim(); // العمود Q - نوع البيع
-          const commission = parseInt(row[17]?.replace(/[^0-9]/g, '') || '0'); // العمود R - عمولة
+          const type = row[16]?.trim(); // العمود Q
+          const commission = parseInt(row[17]?.replace(/[^0-9]/g, '') || '0'); // العمود R
 
           totalMonthEarnings += commission;
 
@@ -107,6 +117,24 @@ export async function POST(req) {
           }
         }
       }
+    }
+
+    // ✅ حساب مؤشر المكافأة
+    const rewardRow = rewardLink.find(row => row[0] === marketerId);
+    const currentSales = parseInt(rewardRow?.[7] || '0');
+    const nextRewardTarget = parseInt(rewardRow?.[8] || '1');
+    const bonusProgress = Math.min(Math.round((currentSales / nextRewardTarget) * 100), 100);
+
+    // ✅ حساب مؤشر الترقية
+    const tierRow = tierRepo[0]; // عناوين الباقات تبدأ من العمود 2
+    const levelIndex = tierRepo.findIndex(row => row[1] === marketerLevel);
+    const nextLevel = tierRepo[levelIndex + 1];
+
+    let upgradeProgress = 100;
+    if (nextLevel) {
+      const requiredSales = parseInt(nextLevel[2] || '1');
+      const actualSales = countDirectCommission + countReferralCommission + countRofRCommission;
+      upgradeProgress = Math.min(Math.round((actualSales / requiredSales) * 100), 100);
     }
 
     const response = {
@@ -127,11 +155,14 @@ export async function POST(req) {
         marketerName,
         marketerLevel,
         currentMonthEarnings: totalMonthEarnings,
+
+        // ✅ الإضافات الجديدة
+        bonusProgress,
+        upgradeProgress,
       }
     };
 
     console.log('✅ Final dashboard response:', JSON.stringify(response, null, 2));
-
     return NextResponse.json(response);
   } catch (error) {
     console.error('❌ Dashboard route error:', error);
