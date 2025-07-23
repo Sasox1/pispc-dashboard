@@ -5,6 +5,8 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
+import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -76,6 +78,10 @@ export default function DashboardPage() {
             <div className="bg-yellow-300/20 border border-yellow-300/30 shadow px-6 py-2 rounded-xl text-xs text-yellow-300 font-medium">
               {marketerTier}
             </div>
+            <div className="flex gap-2 mt-2">
+              <MiniCard title="📢 إشعارات" value="0" />
+              <MiniCard title="📰 أخبار" value="2" />
+            </div>
           </div>
         </div>
 
@@ -93,6 +99,23 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
           <StatCard title="العمولات غير المدفوعة" value={stats.totalPending.toLocaleString()} />
           <StatCard title="عدد ترقياتك" value={stats.upgradeHistory.length} />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <StatCard title="🎯 مؤشر الوصول للمكافأة">
+            <CircularProgressbar
+              value={stats.bonusProgress || 0}
+              text={`${stats.bonusProgress || 0}%`}
+              styles={buildStyles({ pathColor: '#10B981', textColor: '#fff', trailColor: '#374151' })}
+            />
+          </StatCard>
+          <StatCard title="🚀 مؤشر الترقية">
+            <CircularProgressbar
+              value={stats.upgradeProgress || 0}
+              text={`${stats.upgradeProgress || 0}%`}
+              styles={buildStyles({ pathColor: '#F59E0B', textColor: '#fff', trailColor: '#374151' })}
+            />
+          </StatCard>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
@@ -136,16 +159,8 @@ export default function DashboardPage() {
                   };
                   return gradientMap[data.name] || '#ddd';
                 }}
-                axisBottom={{
-                  tickSize: 5,
-                  tickPadding: 5,
-                  tickRotation: 0,
-                }}
-                axisLeft={{
-                  tickSize: 5,
-                  tickPadding: 5,
-                  tickRotation: 0,
-                }}
+                axisBottom={{ tickSize: 5, tickPadding: 5, tickRotation: 0 }}
+                axisLeft={{ tickSize: 5, tickPadding: 5, tickRotation: 0 }}
                 labelSkipWidth={16}
                 labelSkipHeight={12}
                 labelTextColor="#fff"
@@ -189,5 +204,14 @@ function TeamCard({ label, members }) {
         <ul className="list-disc list-inside space-y-1">{members.map((m, i) => <li key={i}>{m}</li>)}</ul>
       ) : <p className="text-gray-500 italic">لا يوجد أعضاء</p>}
     </motion.div>
+  );
+}
+
+function MiniCard({ title, value }) {
+  return (
+    <div className="bg-white/10 border border-white/20 rounded-xl text-xs px-3 py-2 shadow text-center w-[80px]">
+      <div className="font-semibold text-white mb-1">{title}</div>
+      <div className="text-yellow-400 font-bold">{value}</div>
+    </div>
   );
 }
