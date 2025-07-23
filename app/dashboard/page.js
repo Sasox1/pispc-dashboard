@@ -3,7 +3,8 @@
 import { useEffect, useState, Suspense, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { ResponsivePie } from '@nivo/pie';
+import { ResponsiveBar } from '@nivo/bar';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -54,12 +55,15 @@ export default function DashboardPage() {
   }
 
   const chartData = [
-    { name: 'بيع مباشر', value: stats.totalDirectCommission },
-    { name: 'فريق A', value: stats.totalReferralCommission },
-    { name: 'فريق B', value: stats.totalRofRCommission },
+    { id: 'بيع مباشر', label: 'بيع مباشر', value: stats.totalDirectCommission },
+    { id: 'فريق A', label: 'فريق A', value: stats.totalReferralCommission },
+    { id: 'فريق B', label: 'فريق B', value: stats.totalRofRCommission },
   ];
 
-  const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
+  const barData = chartData.map(entry => ({
+    name: entry.label,
+    value: entry.value,
+  }));
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
@@ -84,7 +88,6 @@ export default function DashboardPage() {
           <h1 className="text-lg font-semibold tracking-wide">لوحة تحكم المسوق</h1>
         </div>
 
-        {/* ✅ الصف الأول: 4 مربعات صغيرة بجانب بعضها */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard title="أرباح الشهر الحالي" value={`${stats.currentMonthEarnings.toLocaleString()} SP`} />
           <StatCard title="عمولة البيع المباشر" value={`${stats.totalDirectCommission.toLocaleString()} SP`} />
@@ -92,39 +95,71 @@ export default function DashboardPage() {
           <StatCard title="عمولة الفريق B" value={`${stats.totalRofRCommission.toLocaleString()} SP`} />
         </div>
 
-        {/* ✅ الصف الثاني: العمولات المتبقية وعدد الترقيات */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
           <StatCard title="العمولات غير المدفوعة" value={stats.totalPending.toLocaleString()} />
           <StatCard title="عدد ترقياتك" value={stats.upgradeHistory.length} />
         </div>
 
-        {/* ✅ الرسوم البيانية */}
+        {/* ✅ الرسوم البيانية الجديدة بـ nivo */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <StatCard title="📊 توزيع العمولات">
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie data={chartData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={60}>
-                  {chartData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
+            <div style={{ height: 220 }}>
+              <ResponsivePie
+                data={chartData}
+                colors={{ scheme: 'accent' }}
+                margin={{ top: 30, right: 30, bottom: 40, left: 30 }}
+                innerRadius={0.5}
+                padAngle={1}
+                cornerRadius={5}
+                activeOuterRadiusOffset={8}
+                borderWidth={1}
+                borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+                arcLinkLabelsSkipAngle={10}
+                arcLinkLabelsTextColor="#ccc"
+                arcLinkLabelsThickness={2}
+                arcLabelsTextColor={{ from: 'color', modifiers: [['darker', 2]] }}
+              />
+            </div>
           </StatCard>
 
           <StatCard title="📈 عدد العمولات">
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={chartData}>
-                <XAxis dataKey="name" stroke="#ccc" />
-                <YAxis stroke="#ccc" />
-                <Tooltip />
-                <Bar dataKey="value" fill="#CC5500" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div style={{ height: 220 }}>
+              <ResponsiveBar
+                data={barData}
+                keys={['value']}
+                indexBy="name"
+                margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
+                padding={0.3}
+                colors={{ scheme: 'orange_red' }}
+                axisBottom={{
+                  tickSize: 5,
+                  tickPadding: 5,
+                  tickRotation: 0,
+                  legend: '',
+                  legendPosition: 'middle',
+                  legendOffset: 32
+                }}
+                axisLeft={{
+                  tickSize: 5,
+                  tickPadding: 5,
+                  tickRotation: 0,
+                  legend: '',
+                  legendPosition: 'middle',
+                  legendOffset: -40
+                }}
+                labelSkipWidth={12}
+                labelSkipHeight={12}
+                labelTextColor="#eee"
+                tooltip={({ id, value }) => (
+                  <strong style={{ color: '#FFD700' }}>
+                    {id}: {value}
+                  </strong>
+                )}
+              />
+            </div>
           </StatCard>
         </div>
 
-        {/* ✅ الفريق */}
         <div className="bg-white/10 border border-white/10 rounded-2xl py-3 px-6 text-center mt-8">
           <h2 className="text-md font-semibold tracking-wide">فريقي</h2>
         </div>
