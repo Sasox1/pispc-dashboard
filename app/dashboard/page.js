@@ -145,7 +145,7 @@ export default function DashboardPage() {
                 labelSkipHeight={12}
                 labelTextColor="#fff"
                 tooltip={({ id, value, indexValue }) => (
-                  <div style={{ padding: '6px 10px', background: '#111', color: '#FFD700', borderRadius: '4px' }}>
+                  <div style={{ padding: '6px 10px', background: '#111', color: '#dbd5b4ff', borderRadius: '4px' }}>
                     {indexValue} : {value}
                   </div>
                 )}
