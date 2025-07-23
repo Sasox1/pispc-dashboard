@@ -5,8 +5,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
-import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
-import 'react-circular-progressbar/dist/styles.css';
+import GaugeChart from 'react-gauge-chart';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -102,18 +101,34 @@ export default function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-          <StatCard title="🎯 مؤشر الوصول للمكافأة">
-            <CircularProgressbar
-              value={stats.bonusProgress || 0}
-              text={`${stats.bonusProgress || 0}%`}
-              styles={buildStyles({ pathColor: '#10B981', textColor: '#fff', trailColor: '#374151' })}
+          <StatCard title="🎯 مؤشر الوصول للمكافأة" customSize>
+            <GaugeChart
+              id="bonus-gauge"
+              nrOfLevels={20}
+              percent={(stats.bonusProgress || 0) / 100}
+              arcWidth={0.3}
+              colors={['#FF5F6D', '#FFC371']}
+              textColor="#fff"
+              arcsLength={[0.5, 0.5]}
+              arcPadding={0.02}
+              needleColor="#fff"
+              needleBaseColor="#fff"
+              style={{ width: '100%', height: '120px' }}
             />
           </StatCard>
-          <StatCard title="🚀 مؤشر الترقية">
-            <CircularProgressbar
-              value={stats.upgradeProgress || 0}
-              text={`${stats.upgradeProgress || 0}%`}
-              styles={buildStyles({ pathColor: '#F59E0B', textColor: '#fff', trailColor: '#374151' })}
+          <StatCard title="🚀 مؤشر الترقية" customSize>
+            <GaugeChart
+              id="upgrade-gauge"
+              nrOfLevels={20}
+              percent={(stats.upgradeProgress || 0) / 100}
+              arcWidth={0.3}
+              colors={['#00C9A7', '#92FE9D']}
+              textColor="#fff"
+              arcsLength={[0.5, 0.5]}
+              arcPadding={0.02}
+              needleColor="#fff"
+              needleBaseColor="#fff"
+              style={{ width: '100%', height: '120px' }}
             />
           </StatCard>
         </div>
@@ -187,9 +202,9 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, children }) {
+function StatCard({ title, value, children, customSize = false }) {
   return (
-    <motion.div whileHover={{ scale: 1.03 }} className="bg-white/10 border border-white/10 rounded-2xl shadow-lg p-4 transition hover:shadow-yellow-500/20 text-center">
+    <motion.div whileHover={{ scale: 1.03 }} className={`bg-white/10 border border-white/10 rounded-2xl shadow-lg p-4 transition hover:shadow-yellow-500/20 text-center ${customSize ? 'h-[160px]' : ''}`}>
       <div className="text-xs font-medium mb-1">{title}</div>
       {value ? <div className="text-lg font-bold">{value}</div> : children}
     </motion.div>
