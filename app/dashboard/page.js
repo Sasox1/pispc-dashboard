@@ -54,16 +54,18 @@ export default function DashboardPage() {
     return <div className="p-8 text-gray-500 animate-pulse whitespace-pre-wrap">⏳ جاري تحميل البيانات...{'\n\n'}{debug}</div>;
   }
 
+  // Pie chart based on total SP
   const chartData = [
     { id: 'بيع مباشر', label: 'بيع مباشر', value: stats.totalDirectCommission },
     { id: 'فريق A', label: 'فريق A', value: stats.totalReferralCommission },
     { id: 'فريق B', label: 'فريق B', value: stats.totalRofRCommission },
   ];
 
-  const barData = [
-    { name: 'بيع مباشر', value: stats.directCount },
-    { name: 'فريق A', value: stats.referralCount },
-    { name: 'فريق B', value: stats.rofRCount },
+  // Bar chart based on count of commissions
+  const barCountData = [
+    { name: 'بيع مباشر', count: stats.countDirect },
+    { name: 'فريق A', count: stats.countReferral },
+    { name: 'فريق B', count: stats.countRofR },
   ];
 
   return (
@@ -101,7 +103,7 @@ export default function DashboardPage() {
           <StatCard title="عدد ترقياتك" value={stats.upgradeHistory.length} />
         </div>
 
-        {/* ✅ الرسوم البيانية الجديدة */}
+        {/* ✅ Pie + Updated Bar Chart */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <StatCard title="📊 توزيع العمولات">
             <div style={{ height: 220 }}>
@@ -126,20 +128,12 @@ export default function DashboardPage() {
           <StatCard title="📈 عدد العمولات">
             <div style={{ height: 220 }}>
               <ResponsiveBar
-                data={barData}
-                keys={['value']}
+                data={barCountData}
+                keys={['count']}
                 indexBy="name"
                 margin={{ top: 20, right: 20, bottom: 40, left: 40 }}
-                padding={0.4}
-                colors={({ id, data }) => {
-                  const colorMap = {
-                    'بيع مباشر': '#FFD700',
-                    'فريق A': '#FF6B6B',
-                    'فريق B': '#4ECDC4',
-                  };
-                  return colorMap[data.name] || '#999';
-                }}
-                borderRadius={4}
+                padding={0.35}
+                colors={{ scheme: 'pastel1' }}
                 axisBottom={{
                   tickSize: 5,
                   tickPadding: 5,
@@ -152,10 +146,10 @@ export default function DashboardPage() {
                 }}
                 labelSkipWidth={16}
                 labelSkipHeight={12}
-                labelTextColor="#fff"
+                labelTextColor="#000"
                 tooltip={({ id, value, indexValue }) => (
                   <div style={{ padding: '6px 10px', background: '#111', color: '#FFD700', borderRadius: '4px' }}>
-                    {indexValue} : {value}
+                    {indexValue} : {value} عملية
                   </div>
                 )}
               />
