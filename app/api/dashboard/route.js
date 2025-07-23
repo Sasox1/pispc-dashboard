@@ -42,7 +42,7 @@ export async function POST(req) {
       getSheetData('الهرم'),
       getSheetData('سجل الترقية'),
       getSheetData('صالة المسوقين'),
-      getSheetData('رباط'), // ✅ جديد
+      getSheetData('رباط'),
     ]);
 
     const cleanedCommissions = commissions.filter(row => row[0] && row[0] !== 'ID');
@@ -64,13 +64,17 @@ export async function POST(req) {
     const marketerName = marketerRow?.[1] || 'غير معروف';
     const marketerLevel = marketerRow?.[6] || 'غير محددة';
 
-    // ✅ حساب العمولات من ورقة "رباط"
+    // ✅ حساب العمولات وعددها من ورقة "رباط"
     const currentMonth = getCurrentMonth();
 
     let totalMonthEarnings = 0;
     let directCommission = 0;
     let teamACommission = 0;
     let teamBCommission = 0;
+
+    let countDirectCommission = 0;
+    let countReferralCommission = 0;
+    let countRofRCommission = 0;
 
     for (let row of rabat) {
       if (!row[0] || row[0] === 'رقم المسوق') continue;
@@ -91,9 +95,16 @@ export async function POST(req) {
 
           totalMonthEarnings += commission;
 
-          if (type === 'بيع مباشر') directCommission += commission;
-          else if (type === 'احالة') teamACommission += commission;
-          else if (type === 'احالة احالة') teamBCommission += commission;
+          if (type === 'بيع مباشر') {
+            directCommission += commission;
+            countDirectCommission++;
+          } else if (type === 'احالة') {
+            teamACommission += commission;
+            countReferralCommission++;
+          } else if (type === 'احالة احالة') {
+            teamBCommission += commission;
+            countRofRCommission++;
+          }
         }
       }
     }
@@ -103,6 +114,11 @@ export async function POST(req) {
         totalDirectCommission: directCommission,
         totalReferralCommission: teamACommission,
         totalRofRCommission: teamBCommission,
+
+        countDirectCommission,
+        countReferralCommission,
+        countRofRCommission,
+
         totalPaid,
         totalPending,
         upgradeHistory: upgradeRecords,
