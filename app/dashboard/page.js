@@ -4,9 +4,6 @@ import { useEffect, useState, Suspense, useRef } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Environment, Lightformer } from '@react-three/drei';
-import * as THREE from 'three';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -57,21 +54,19 @@ export default function DashboardPage() {
   }
 
   const chartData = [
-    { name: 'مباشر', value: stats.totalDirectCommission },
-    { name: 'إحالة', value: stats.totalReferralCommission },
-    { name: 'إحالة الإحالة', value: stats.totalRofRCommission },
+    { name: 'بيع مباشر', value: stats.totalDirectCommission },
+    { name: 'فريق A', value: stats.totalReferralCommission },
+    { name: 'فريق B', value: stats.totalRofRCommission },
   ];
 
   const colors = ['#B8860B', '#CC5500', '#3A3A3A'];
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
-      {/* خلفية جديدة بلون #0c1326 مع شعاع خلف اللوجو */}
       <div className="absolute inset-0 -z-10 bg-[#0c1326]">
         <div className="absolute top-0 left-0 w-[420px] h-[200px] bg-white/40 blur-3xl rounded-full opacity-90 shadow-[0_0_100px_80px_rgba(255,255,255,0.3)] pointer-events-none" />
       </div>
 
-      {/* المحتوى */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7 }} className="relative z-10 p-8 space-y-8">
         <div className="flex items-center justify-between">
           <Image src="/logo.png" alt="PISPC Logo" width={360} height={360} />
@@ -89,16 +84,22 @@ export default function DashboardPage() {
           <h1 className="text-lg font-semibold tracking-wide">لوحة تحكم المسوق</h1>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <StatCard title="العمولة المباشرة" value={stats.totalDirectCommission + ' SP'} />
-          <StatCard title="عمولة الإحالة" value={stats.totalReferralCommission + ' SP'} />
-          <StatCard title="عمولة إحالة الإحالة" value={stats.totalRofRCommission + ' SP'} />
-          <StatCard title="العمولات المدفوعة" value={stats.totalPaid} />
-          <StatCard title="العمولات غير المدفوعة" value={stats.totalPending} />
+        {/* ✅ الصف الأول: 4 مربعات صغيرة بجانب بعضها */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard title="أرباح الشهر الحالي" value={`${stats.currentMonthEarnings.toLocaleString()} SP`} />
+          <StatCard title="عمولة البيع المباشر" value={`${stats.totalDirectCommission.toLocaleString()} SP`} />
+          <StatCard title="عمولة الفريق A" value={`${stats.totalReferralCommission.toLocaleString()} SP`} />
+          <StatCard title="عمولة الفريق B" value={`${stats.totalRofRCommission.toLocaleString()} SP`} />
+        </div>
+
+        {/* ✅ الصف الثاني: العمولات المتبقية وعدد الترقيات */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+          <StatCard title="العمولات غير المدفوعة" value={stats.totalPending.toLocaleString()} />
           <StatCard title="عدد ترقياتك" value={stats.upgradeHistory.length} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* ✅ الرسوم البيانية */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <StatCard title="📊 توزيع العمولات">
             <ResponsiveContainer width="100%" height={200}>
               <PieChart>
@@ -123,7 +124,8 @@ export default function DashboardPage() {
           </StatCard>
         </div>
 
-        <div className="bg-white/10 border border-white/10 rounded-2xl py-3 px-6 text-center">
+        {/* ✅ الفريق */}
+        <div className="bg-white/10 border border-white/10 rounded-2xl py-3 px-6 text-center mt-8">
           <h2 className="text-md font-semibold tracking-wide">فريقي</h2>
         </div>
 
@@ -138,9 +140,9 @@ export default function DashboardPage() {
 
 function StatCard({ title, value, children }) {
   return (
-    <motion.div whileHover={{ scale: 1.03 }} className="bg-white/10 border border-white/10 rounded-2xl shadow-lg p-6 transition hover:shadow-yellow-500/20">
-      <div className="text-sm mb-1 font-medium">{title}</div>
-      {value ? <div className="text-2xl font-bold">{value}</div> : children}
+    <motion.div whileHover={{ scale: 1.03 }} className="bg-white/10 border border-white/10 rounded-2xl shadow-lg p-4 transition hover:shadow-yellow-500/20 text-center">
+      <div className="text-xs font-medium mb-1">{title}</div>
+      {value ? <div className="text-lg font-bold">{value}</div> : children}
     </motion.div>
   );
 }
