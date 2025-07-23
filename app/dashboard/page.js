@@ -60,10 +60,11 @@ export default function DashboardPage() {
     { id: 'فريق B', label: 'فريق B', value: stats.totalRofRCommission },
   ];
 
-  const barData = chartData.map(entry => ({
-    name: entry.label,
-    value: entry.value,
-  }));
+  const barData = [
+    { name: 'بيع مباشر', value: stats.directCount },
+    { name: 'فريق A', value: stats.referralCount },
+    { name: 'فريق B', value: stats.rofRCount },
+  ];
 
   return (
     <div className="relative min-h-screen overflow-hidden font-sans text-[#E0E0E0]">
