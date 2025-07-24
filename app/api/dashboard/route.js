@@ -2,8 +2,12 @@
 
 import { google } from 'googleapis';
 import { JWT } from 'google-auth-library';
-import credentials from '@/utils/credentials.json';
 import { NextResponse } from 'next/server';
+
+const credentials = {
+  client_email: process.env.GOOGLE_CLIENT_EMAIL,
+  private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+};
 
 const spreadsheetId = '1XmZKicNeBpdu2MKvDFlFgu4tWMgBT9YQWeP2hkxyfHA';
 
@@ -100,8 +104,8 @@ export async function POST(req) {
 
       for (let { month, check } of monthCols) {
         if (month === currentMonth && check === '✓') {
-          const type = row[16]?.trim(); // العمود Q
-          const commission = parseInt(row[17]?.replace(/[^0-9]/g, '') || '0'); // العمود R
+          const type = row[16]?.trim();
+          const commission = parseInt(row[17]?.replace(/[^0-9]/g, '') || '0');
 
           totalMonthEarnings += commission;
 
@@ -126,7 +130,7 @@ export async function POST(req) {
     const bonusProgress = Math.min(Math.round((currentSales / nextRewardTarget) * 100), 100);
 
     // ✅ حساب مؤشر الترقية
-    const tierRow = tierRepo[0]; // عناوين الباقات تبدأ من العمود 2
+    const tierRow = tierRepo[0];
     const levelIndex = tierRepo.findIndex(row => row[1] === marketerLevel);
     const nextLevel = tierRepo[levelIndex + 1];
 
@@ -142,11 +146,9 @@ export async function POST(req) {
         totalDirectCommission: directCommission,
         totalReferralCommission: teamACommission,
         totalRofRCommission: teamBCommission,
-
         countDirectCommission,
         countReferralCommission,
         countRofRCommission,
-
         totalPaid,
         totalPending,
         upgradeHistory: upgradeRecords,
@@ -155,8 +157,6 @@ export async function POST(req) {
         marketerName,
         marketerLevel,
         currentMonthEarnings: totalMonthEarnings,
-
-        // ✅ الإضافات الجديدة
         bonusProgress,
         upgradeProgress,
       }
