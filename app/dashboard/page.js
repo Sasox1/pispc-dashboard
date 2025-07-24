@@ -5,8 +5,6 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
-import GaugeChart from 'react-gauge-chart';
-import 'react-circular-progressbar/dist/styles.css';
 
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
@@ -103,40 +101,10 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <StatCard title="🎯 مؤشر الوصول للمكافأة">
-            <div className="flex justify-center items-center h-32">
-              <GaugeChart
-                id="bonus-gauge"
-                nrOfLevels={20}
-                percent={(stats.bonusProgress || 0) / 100}
-                arcPadding={0.03}
-                cornerRadius={2}
-                textColor="#ffffff"
-                arcsLength={[1]}
-                colors={["#10B981"]}
-                needleColor="#FCD34D"
-                animate={false}
-                arcWidth={0.3}
-                style={{ width: '100%', maxWidth: '200px' }}
-              />
-            </div>
+            <SemiCircleProgress value={stats.bonusProgress || 0} color="#10B981" />
           </StatCard>
           <StatCard title="🚀 مؤشر الترقية">
-            <div className="flex justify-center items-center h-32">
-              <GaugeChart
-                id="upgrade-gauge"
-                nrOfLevels={20}
-                percent={(stats.upgradeProgress || 0) / 100}
-                arcPadding={0.03}
-                cornerRadius={2}
-                textColor="#ffffff"
-                arcsLength={[1]}
-                colors={["#F59E0B"]}
-                needleColor="#FCD34D"
-                animate={false}
-                arcWidth={0.3}
-                style={{ width: '100%', maxWidth: '200px' }}
-              />
-            </div>
+            <SemiCircleProgress value={stats.upgradeProgress || 0} color="#F59E0B" />
           </StatCard>
         </div>
 
@@ -175,9 +143,9 @@ export default function DashboardPage() {
                 padding={0.4}
                 colors={({ id, data }) => {
                   const gradientMap = {
-                    'بيع مباشر': '#f6db98ff',
-                    'فريق A': '#9cc3f4ff',
-                    'فريق B': '#f4b1d4ff',
+                    'بيع مباشر': '#FBBF24',
+                    'فريق A': '#60A5FA',
+                    'فريق B': '#F472B6',
                   };
                   return gradientMap[data.name] || '#ddd';
                 }}
@@ -235,5 +203,29 @@ function MiniCard({ title, value }) {
       <div className="font-semibold text-white mb-1">{title}</div>
       <div className="text-yellow-400 font-bold">{value}</div>
     </div>
+  );
+}
+
+function SemiCircleProgress({ value, color }) {
+  const radius = 50;
+  const circumference = Math.PI * radius;
+  const offset = circumference * (1 - value / 100);
+
+  return (
+    <svg width="100%" height="80" viewBox="0 0 120 60">
+      <path d="M10,60 A50,50 0 0,1 110,60" fill="none" stroke="#374151" strokeWidth="10" />
+      <path
+        d="M10,60 A50,50 0 0,1 110,60"
+        fill="none"
+        stroke={color}
+        strokeWidth="10"
+        strokeDasharray={`${circumference}`}
+        strokeDashoffset={offset}
+        strokeLinecap="round"
+      />
+      <text x="60" y="40" textAnchor="middle" fill="#fff" fontSize="16" fontWeight="bold">
+        {`${value}%`}
+      </text>
+    </svg>
   );
 }
